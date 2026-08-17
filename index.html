@@ -57,7 +57,7 @@ h1{font-size:1.3rem; font-weight:800;} h2{font-size:1.1rem; font-weight:800;} h3
 .row{display:flex; gap:10px; align-items:center;}
 .hint{font-size:.78rem; color:var(--tx3); margin-top:5px; line-height:1.35;}
 /* tabla de rutina */
-.dia{margin-bottom:14px; overflow:hidden;}
+.dia{margin-bottom:14px;}
 .dia-h{display:flex; align-items:flex-start; justify-content:space-between; padding:12px 14px 9px; border-bottom:1px solid var(--border);}
 .dia-h b{font-weight:800; font-size:1rem;}
 .dia-h small{color:var(--tx2); font-weight:400;}
@@ -73,6 +73,7 @@ h1{font-size:1.3rem; font-weight:800;} h2{font-size:1.1rem; font-weight:800;} h3
 .trow input.logv{background:#0a171f; border:1px solid rgba(29,155,240,.25);}
 .menu-btn{color:var(--tx3); font-size:1rem; text-align:center; padding:4px 0; letter-spacing:1px;}
 .menu{position:absolute; right:8px; top:calc(100% - 8px); background:#000; border:1px solid var(--border); border-radius:14px; z-index:30; box-shadow:0 0 14px rgba(255,255,255,.18); overflow:hidden; min-width:160px;}
+.menu.up{top:auto; bottom:calc(100% - 8px);}
 .menu button{display:block; width:100%; text-align:left; padding:11px 15px; font-size:.85rem; font-weight:600;}
 .menu button:active{background:var(--card2);}
 .addex{width:100%; text-align:center; padding:11px; color:var(--ac); font-size:.88rem; font-weight:600; border-top:1px solid var(--border);}
@@ -224,6 +225,8 @@ function cargar(){
   if(!S||!S.ejercicios){ S={ejercicios:DB.map((e,i)=>({id:'e'+i,nombre:e[0],musculo:e[1],tier:e[2],reps:e[3],custom:false})),rutinas:[]}; guardar(); }
   S.rutinas.forEach(r=>{ if(!r.sesiones) r.sesiones=[]; });
   if(!S.descanso) S.descanso=90;
+  if(!S.desde) S.desde=hoy();
+  if(S.ultimoRespaldo===undefined) S.ultimoRespaldo=null;
 }
 function guardar(){ localStorage.setItem(KEY,JSON.stringify(S)); }
 function uid(){ return 'x'+Date.now().toString(36)+Math.random().toString(36).slice(2,6); }
@@ -437,6 +440,7 @@ function vInicio(){
   <div class="wrap">
     ${bannerSesion()}
     ${bannerInstalar()}
+    ${bannerRespaldo()}
     <button class="btn full" onclick="irCrear()">＋ Nueva rutina</button>
     <div style="height:14px"></div>
     ${cards}
@@ -577,7 +581,18 @@ function vDia(r,d,di){
     <button class="addex" onclick="abrirPicker('agregar',${di})">Agregar ejercicio</button>
   </div>`;
 }
-function togMenu(k){ menuAbierto=menuAbierto===k?null:k; rerender(); }
+function togMenu(k){
+  menuAbierto=menuAbierto===k?null:k; rerender();
+  if(menuAbierto!=null) requestAnimationFrame(ajustarMenu);
+}
+function ajustarMenu(){
+  const menu=document.querySelector('.menu'); if(!menu) return;
+  menu.classList.remove('up');
+  const r=menu.getBoundingClientRect();
+  const tabs=document.querySelector('.tabs');
+  const limite=tabs?tabs.getBoundingClientRect().top:window.innerHeight;
+  if(r.bottom>limite) menu.classList.add('up');
+}
 function setEj(di,ei,campo,val){ const r=rutina(vista.rid); r.dias[di].ejercicios[ei][campo]=val; guardar(); rerender(); }
 function logEj(di,ei,campo,val){
   const r=rutina(vista.rid), e=r.dias[di].ejercicios[ei];
@@ -799,6 +814,17 @@ function bannerInstalar(){
   return `<div class="card">
     <h3>📲 Instalar como app</h3>
     <p class="hint" style="margin-top:6px">Si no ves el botón de instalar, abrí esta página en <b>Chrome</b> (no desde el navegador de WhatsApp o Instagram) y tocá el menú <b>⋮</b> arriba a la derecha → <b>Instalar aplicación</b> o <b>Agregar a pantalla principal</b>.</p>
+  </div>`;
+}
+function bannerRespaldo(){
+  if(!S.rutinas.length) return '';
+  const ref=S.ultimoRespaldo||S.desde;
+  const dias=Math.round((new Date(hoy()+'T12:00:00')-new Date(ref+'T12:00:00'))/86400000);
+  if(dias<14) return '';
+  return `<div class="card rcard" style="border-color:var(--ac)" onclick="exportar()">
+    <div class="dot" style="background:var(--ac)">💾</div>
+    <div class="meta"><small>El navegador puede borrar los datos guardados si pasa tiempo sin usar la app</small><h3>Hacer respaldo ahora</h3></div>
+    <span style="color:var(--ac);font-weight:700">Exportar</span>
   </div>`;
 }
 function instalarApp(){
@@ -1033,7 +1059,8 @@ function exportar(){
   a.href=URL.createObjectURL(blob);
   a.download='rutinas-respaldo-'+hoy()+'.json';
   a.click(); URL.revokeObjectURL(a.href);
-  toast('Respaldo descargado');
+  S.ultimoRespaldo=hoy(); guardar();
+  toast('Respaldo descargado'); rerender();
 }
 function importar(inp){
   const f=inp.files[0]; if(!f) return;
@@ -1066,6 +1093,11 @@ document.addEventListener('click',e=>{
 
 cargar();
 render();
+
+/* pedirle al navegador que no borre los datos por inactividad */
+if(navigator.storage&&navigator.storage.persist){
+  navigator.storage.persisted().then(ya=>{ if(!ya) navigator.storage.persist(); });
+}
 
 /* PWA: solo se registra cuando la app corre desde una URL https (GitHub Pages) */
 if('serviceWorker' in navigator&&(location.protocol==='https:'||location.hostname==='localhost')){
