@@ -124,7 +124,7 @@ details .body{background:var(--card); border:1px solid var(--border); border-top
 @keyframes tup{from{opacity:0; transform:translate(-50%,10px)} to{opacity:1; transform:translate(-50%,0)}}
 /* modo entrenamiento */
 .srow{display:grid; grid-template-columns:3.4rem 1fr 1fr 2.6rem; gap:8px; align-items:center; padding:5px 0;}
-.srow input{text-align:center; padding:8px 4px;}
+.srow input{width:100%; min-width:0; text-align:center; padding:8px 4px;}
 .chk{width:38px; height:38px; border-radius:50%; border:1px solid var(--border); color:var(--tx3); font-weight:700;}
 .chk.ok{background:var(--ok); border-color:var(--ok); color:#fff;}
 .tbar{position:fixed; bottom:0; left:0; right:0; max-width:760px; margin:0 auto; background:var(--ac); color:#fff; display:flex; justify-content:space-between; align-items:center; padding:10px 16px; z-index:60; font-weight:700;}
@@ -300,6 +300,21 @@ function normalizar(){
   if(!Array.isArray(S.medidas)) S.medidas=[];
   if(!S.desde) S.desde=hoy();
   if(S.ultimoRespaldo===undefined) S.ultimoRespaldo=null;
+  if(!S.logs) S.logs={};
+  // migración: el historial de peso/reps vivía por instancia de ejercicio (por día),
+  // por eso el mismo ejercicio en dos días no se veía conectado. Se junta todo en
+  // S.logs (por ejercicio, global) y se borra de la instancia vieja — idempotente,
+  // en la siguiente carga ya no queda e.log para migrar.
+  S.rutinas.forEach(r=>r.dias.forEach(d=>d.ejercicios.forEach(e=>{
+    if(e.log&&e.log.length){ mezclarLog(e.exId,e.log); delete e.log; }
+  })));
+}
+function mezclarLog(exId,entries){
+  if(!entries||!entries.length) return;
+  const mapa={};
+  (S.logs[exId]||[]).forEach(x=>{ mapa[x.f]=x; });
+  entries.forEach(x=>{ if(x&&x.f) mapa[x.f]={f:x.f,p:x.p!=null?x.p:null,r:x.r!=null?x.r:null}; });
+  S.logs[exId]=Object.values(mapa).sort((a,b)=>a.f<b.f?-1:(a.f>b.f?1:0));
 }
 function guardar(){ localStorage.setItem(KEY,JSON.stringify(S)); }
 function uid(){ return 'x'+Date.now().toString(36)+Math.random().toString(36).slice(2,6); }
@@ -307,8 +322,8 @@ function isoDe(d){ return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,
 function hoy(){ return isoDe(new Date()); }
 function fFecha(iso){ const p=iso.split('-'); return p[2]+'/'+p[1]; }
 function repsTope(reps){ const s=String(reps); if(/s$/i.test(s)) return null; const m=s.match(/(\d+)(?!.*\d)/); return m?+m[1]:null; }
-function prDe(r,exId){ let best=null; r.dias.forEach(d=>d.ejercicios.forEach(e=>{ if(e.exId===exId&&e.log) e.log.forEach(l=>{ if(l.p!=null&&(best==null||l.p>best)) best=l.p; }); })); return best; }
-function fechasEntrenadas(r){ const set=new Set(); (r.sesiones||[]).forEach(s=>set.add(s.f)); r.dias.forEach(d=>d.ejercicios.forEach(e=>(e.log||[]).forEach(l=>set.add(l.f)))); return set; }
+function prDe(exId){ const l=S.logs[exId]; if(!l) return null; let best=null; l.forEach(x=>{ if(x.p!=null&&(best==null||x.p>best)) best=x.p; }); return best; }
+function fechasEntrenadas(r){ const set=new Set(); (r.sesiones||[]).forEach(s=>set.add(s.f)); r.dias.forEach(d=>d.ejercicios.forEach(e=>(S.logs[e.exId]||[]).forEach(l=>set.add(l.f)))); return set; }
 function claveSemana(iso){ const d=new Date(iso+'T12:00:00'); const dia=(d.getDay()+6)%7; d.setDate(d.getDate()-dia); return isoDe(d); }
 function rachaSemanas(fechas){
   const sem=new Set(); fechas.forEach(f=>sem.add(claveSemana(f)));
@@ -321,7 +336,7 @@ function rachaSemanas(fechas){
 function exPorId(id){ return S.ejercicios.find(e=>e.id===id); }
 function rutina(id){ return S.rutinas.find(r=>r.id===id); }
 function esc(s){ return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/"/g,'&quot;'); }
-function ultLog(ej){ return ej.log&&ej.log.length?ej.log[ej.log.length-1]:null; }
+function ultLog(exId){ const l=S.logs[exId]; return l&&l.length?l[l.length-1]:null; }
 
 let vista={p:'inicio'};
 let formCrear=null;  // estado del formulario de creación (ojo: no llamarlo "form" — choca con la propiedad .form de los elementos en handlers inline)
@@ -445,7 +460,7 @@ function generarRutina(p){
       const q=cuota[di][m]; if(!q) return;
       partirSeries(q).forEach(ser=>{
         const e=pick(m); if(!e) return;
-        (porDia[di][m]=porDia[di][m]||[]).push({id:uid(),exId:e.id,series:ser,reps:e.reps,log:[]});
+        (porDia[di][m]=porDia[di][m]||[]).push({id:uid(),exId:e.id,series:ser,reps:e.reps});
       });
     });
   });
@@ -460,7 +475,7 @@ function generarRutina(p){
     const ex=exPorId(id); if(!ex) return;
     let di=split.dias.findIndex(d=>d.musculos.includes(ex.musculo));
     if(di<0){ di=0; dias.forEach((d,i)=>{ if(d.ejercicios.length<dias[di].ejercicios.length) di=i; }); }
-    dias[di].ejercicios.push({id:uid(),exId:id,series:3,reps:ex.reps,log:[]});
+    dias[di].ejercicios.push({id:uid(),exId:id,series:3,reps:ex.reps});
   });
   // asignar días de la semana en orden
   const orden=DIAS_SEM.filter(d=>p.diasSem.includes(d));
@@ -642,8 +657,8 @@ function vRutina(){
 function vDia(r,d,di){
   const filas=d.ejercicios.map((e,ei)=>{
     const ex=exPorId(e.exId)||{nombre:'(borrado)',musculo:''};
-    const u=ultLog(e);
-    const pr=prDe(r,e.exId);
+    const u=ultLog(e.exId);
+    const pr=prDe(e.exId);
     const tope=repsTope(e.reps);
     const subir=u&&u.r!=null&&tope&&u.r>=tope;
     return `<div class="trow">
@@ -688,14 +703,14 @@ function ajustarMenu(){
 function setEj(di,ei,campo,val){ const r=rutina(vista.rid); r.dias[di].ejercicios[ei][campo]=val; guardar(); rerender(); }
 function logEj(di,ei,campo,val){
   const r=rutina(vista.rid), e=r.dias[di].ejercicios[ei];
-  const prevPR=campo==='p'?prDe(r,e.exId):null;
-  e.log=e.log||[];
-  let u=e.log.length?e.log[e.log.length-1]:null;
+  const prevPR=campo==='p'?prDe(e.exId):null;
+  const l=S.logs[e.exId]=S.logs[e.exId]||[];
+  let u=l.length?l[l.length-1]:null;
   const v=val===''?null:+val;
   if(u&&u.f===hoy()){ u[campo]=v; }
   else{
     const nuevo={f:hoy(),p:u?u.p:null,r:u?u.r:null};
-    nuevo[campo]=v; e.log.push(nuevo);
+    nuevo[campo]=v; l.push(nuevo);
   }
   guardar(); rerender();
   if(campo==='p'&&v!=null&&prevPR!=null&&v>prevPR) toast('🏆 ¡Nuevo récord! '+v+' kg');
@@ -727,13 +742,10 @@ function vChart(r){
   // por defecto: primer ejercicio con historial
   let sel=vista.chartEx;
   if(!sel){
-    for(const d of r.dias){ for(const e of d.ejercicios){ if(e.log&&e.log.some(l=>l.p!=null)){ sel=e.exId; break; } } if(sel)break; }
+    for(const o of ops){ if((S.logs[o.id]||[]).some(l=>l.p!=null)){ sel=o.id; break; } }
     if(!sel) sel=ops[0].id;
   }
-  // juntar logs de todas las instancias de ese ejercicio
-  const pts=[];
-  r.dias.forEach(d=>d.ejercicios.forEach(e=>{ if(e.exId===sel&&e.log) e.log.forEach(l=>{ if(l.p!=null) pts.push(l); }); }));
-  pts.sort((a,b)=>a.f<b.f?-1:1);
+  const pts=(S.logs[sel]||[]).filter(l=>l.p!=null).slice().sort((a,b)=>a.f<b.f?-1:1);
   let svg;
   if(pts.length<2){
     svg=`<div class="empty" style="padding:22px 10px">${pts.length===1?'Un solo registro ('+pts[0].p+' kg el '+fFecha(pts[0].f)+').<br>Cargá peso otro día para ver la curva.':'Sin registros de peso todavía.<br>Anotá el peso en la columna "Peso" y acá vas a ver tu progreso.'}</div>`;
@@ -1006,12 +1018,12 @@ function elegirEx(id){
   else if(m==='reemplazar'){
     const e=rutina(vista.rid).dias[picker.di].ejercicios[picker.ei];
     const ex=exPorId(id);
-    e.exId=id; e.reps=ex.reps; e.log=[];
+    e.exId=id; e.reps=ex.reps;
     guardar(); cerrarPicker(); menuAbierto=null; rerender();
   }
   else if(m==='agregar'){
     const ex=exPorId(id);
-    rutina(vista.rid).dias[picker.di].ejercicios.push({id:uid(),exId:id,series:3,reps:ex.reps,log:[]});
+    rutina(vista.rid).dias[picker.di].ejercicios.push({id:uid(),exId:id,series:3,reps:ex.reps});
     guardar(); cerrarPicker(); rerender();
   }
 }
@@ -1082,7 +1094,7 @@ function empezarSesion(di){
   const r=rutina(vista.rid), d=r.dias[di];
   S.sesionActiva={rid:r.id, di, f:hoy(), inicio:Date.now(),
     ej:d.ejercicios.map(e=>{
-      const u=ultLog(e);
+      const u=ultLog(e.exId);
       return {iid:e.id, exId:e.exId, reps:e.reps, nota:e.nota||'',
         series:Array.from({length:e.series},()=>({p:u&&u.p!=null?u.p:null,r:null,ok:false}))};
     })};
@@ -1094,8 +1106,7 @@ function vSesion(){
   const d=r.dias[s.di];
   const cards=s.ej.map((se,i)=>{
     const ex=exPorId(se.exId)||{nombre:'?',musculo:''};
-    const inst=d.ejercicios.find(x=>x.id===se.iid);
-    const u=inst?ultLog(inst):null;
+    const u=ultLog(se.exId);
     const tope=repsTope(se.reps);
     const subir=u&&u.r!=null&&tope&&u.r>=tope;
     const filas=se.series.map((st,j)=>`
@@ -1326,13 +1337,10 @@ function finalizarSesion(){
     reg.ej.push({exId:se.exId, series:hechas.map(x=>({p:x.p,r:x.r}))});
     const best=hechas.reduce((a,x)=>(x.p!=null&&(a==null||x.p>a.p))?x:a,null);
     if(best){
-      const prev=prDe(r,se.exId);
-      const inst=d.ejercicios.find(x=>x.id===se.iid);
-      if(inst){
-        inst.log=inst.log||[];
-        const u=inst.log.length?inst.log[inst.log.length-1]:null;
-        if(u&&u.f===reg.f){ u.p=best.p; u.r=best.r; } else inst.log.push({f:reg.f,p:best.p,r:best.r});
-      }
+      const prev=prDe(se.exId);
+      const l=S.logs[se.exId]=S.logs[se.exId]||[];
+      const u=l.length?l[l.length-1]:null;
+      if(u&&u.f===reg.f){ u.p=best.p; u.r=best.r; } else l.push({f:reg.f,p:best.p,r:best.r});
       if(prev!=null&&best.p>prev){ const ex=exPorId(se.exId); prs.push((ex?ex.nombre:'?')+' → '+best.p+' kg'); }
     }
   });
@@ -1454,7 +1462,7 @@ function serializarRutina(r){
         const ex=exPorId(e.exId)||{nombre:'Ejercicio',musculo:'Pecho',tier:3};
         return {nombre:ex.nombre, musculo:ex.musculo, tier:ex.tier,
                 series:e.series, reps:e.reps, nota:e.nota||'',
-                log:(e.log||[]).map(l=>({f:l.f,p:l.p,r:l.r}))};
+                log:(S.logs[e.exId]||[]).map(l=>({f:l.f,p:l.p,r:l.r}))};
       })
     }))
   };
@@ -1470,10 +1478,11 @@ function resolverEx(o){
 function materializarDias(pl,conPesos){
   return pl.dias.map(d=>({
     dia:d.dia||'', titulo:d.titulo||'',
-    ejercicios:(d.ejercicios||[]).map(e=>({
-      id:uid(), exId:resolverEx(e), series:+e.series||3, reps:e.reps||'10-12',
-      nota:e.nota||'', log:conPesos?(e.log||[]).map(l=>({f:l.f,p:l.p,r:l.r})):[]
-    }))
+    ejercicios:(d.ejercicios||[]).map(e=>{
+      const exId=resolverEx(e);
+      if(conPesos&&(e.log||[]).length) mezclarLog(exId,e.log);
+      return {id:uid(), exId, series:+e.series||3, reps:e.reps||'10-12', nota:e.nota||''};
+    })
   }));
 }
 function copiarRutina(id){
