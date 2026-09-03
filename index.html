@@ -11,185 +11,335 @@
 <title>Mis Rutinas</title>
 <style>
 :root{
-  --bg:#000000; --card:#0a0c0f; --card2:#181b21; --border:#252b32; --border2:#39414a;
-  --tx:#f3f5f7; --tx2:#8a929b; --tx3:#5c656e;
-  --ac:#1d9bf0; --ac2:#4db5f7; --acg:linear-gradient(135deg,#2ba5f5,#0c78c6);
-  --ok:#00ba7c; --bad:#f4212e; --warn:#ffb020;
-  --r:18px; --sh:0 6px 22px rgba(0,0,0,.55);
+  /* ===== Material 3 · esquema oscuro =====
+     Primario azul (continuidad con la identidad previa), terciario verde para logros/PRs.
+     Los nombres siguen los roles de M3: un rol de color siempre se usa con su "on-" par. */
+  --primary:#86d1ff; --on-primary:#00344b; --primary-c:#004b6b; --on-primary-c:#c7e7ff;
+  --secondary:#b5c9d7; --on-secondary:#20333e; --secondary-c:#364955; --on-secondary-c:#d1e5f4;
+  --tertiary:#7bdca0; --on-tertiary:#00391f; --tertiary-c:#00522f; --on-tertiary-c:#97f9bb;
+  --error:#ffb4ab; --on-error:#690005; --error-c:#93000a; --on-error-c:#ffdad6;
+  --warn:#ffd8a0;
+  /* superficies tonales (M3 no usa negro puro en oscuro) */
+  --surface:#0e1418; --surface-bright:#343a3e;
+  --sc-lowest:#090f12; --sc-low:#161c20; --sc:#1a2024; --sc-high:#252b2f; --sc-highest:#2f353a;
+  --on-surface:#dfe3e7; --on-surface-var:#bfc8ce;
+  --outline:#899298; --outline-var:#3f484e;
+  --inverse-surface:#dfe3e7; --inverse-on-surface:#2c3134;
+  /* forma */
+  --r-xs:4px; --r-s:8px; --r-m:12px; --r-l:16px; --r-xl:28px; --r-full:9999px;
+  /* movimiento: curvas y duraciones de M3 */
+  --e-emph:cubic-bezier(.2,0,0,1); --e-emph-dec:cubic-bezier(.05,.7,.1,1); --e-emph-acc:cubic-bezier(.3,0,.8,.15);
+  --e-std:cubic-bezier(.2,0,0,1); --e-std-dec:cubic-bezier(0,0,0,1);
+  --d-s:200ms; --d-m:350ms; --d-l:500ms;
+  /* ícono de check, usado como máscara en chips y segmented buttons */
+  --ico-check:url("data:image/svg+xml;charset=utf8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M9 16.2 4.8 12l-1.4 1.4L9 19 21 7l-1.4-1.4z'/%3E%3C/svg%3E");
+  /* elevación */
+  --el1:0 1px 3px 1px rgba(0,0,0,.35), 0 1px 2px rgba(0,0,0,.5);
+  --el2:0 2px 6px 2px rgba(0,0,0,.35), 0 1px 2px rgba(0,0,0,.5);
+  --el3:0 4px 8px 3px rgba(0,0,0,.35), 0 1px 3px rgba(0,0,0,.5);
 }
 *{box-sizing:border-box; margin:0; padding:0; -webkit-tap-highlight-color:transparent;}
-html,body{background:var(--bg); color:var(--tx); font-family:system-ui,-apple-system,'Segoe UI',Roboto,sans-serif; font-size:15px; -webkit-font-smoothing:antialiased; text-rendering:optimizeLegibility;}
-body{padding-bottom:66px; max-width:760px; margin:0 auto;}
-body.crono{padding-bottom:292px;}
+html,body{background:var(--surface); color:var(--on-surface); font-family:Roboto,system-ui,-apple-system,'Segoe UI',sans-serif; font-size:16px; -webkit-font-smoothing:antialiased;}
+/* sin padding-bottom acá: el espacio para la nav bar y el cronómetro lo reserva
+   ajustarEspacioCrono() con un espaciador real (el padding de <body> no scrollea) */
+body{max-width:760px; margin:0 auto;}
 button{font-family:inherit; cursor:pointer; border:none; background:none; color:inherit; font-size:inherit;}
-input,select,textarea{font-family:inherit; font-size:inherit; color:var(--tx); background:var(--card2); border:1px solid var(--border); border-radius:11px; padding:9px 11px; outline:none; max-width:100%; transition:border-color .15s, background .15s, box-shadow .15s;}
-input:focus,select:focus,textarea:focus{border-color:var(--ac); background:#000; box-shadow:0 0 0 3px rgba(29,155,240,.16);}
-input::placeholder{color:var(--tx3);}
+input,select,textarea{font-family:inherit; font-size:1rem; color:var(--on-surface); background:var(--sc-high); border:none; border-bottom:1px solid var(--outline); border-radius:var(--r-xs) var(--r-xs) 0 0; padding:10px 12px; outline:none; max-width:100%; transition:background var(--d-s) var(--e-std), border-color var(--d-s) var(--e-std), box-shadow var(--d-s) var(--e-std);}
+input:focus,select:focus,textarea:focus{border-bottom-color:var(--primary); background:var(--sc-highest); box-shadow:inset 0 -1px 0 var(--primary);}
+input::placeholder{color:var(--on-surface-var); opacity:.7;}
 input[type=number]{-moz-appearance:textfield;}
 input::-webkit-outer-spin-button,input::-webkit-inner-spin-button{-webkit-appearance:none;}
-h1{font-size:1.42rem; font-weight:800; letter-spacing:-.5px;} h2{font-size:1.12rem; font-weight:800; letter-spacing:-.35px;} h3{font-size:1.03rem; font-weight:700; letter-spacing:-.2px;}
-.hdr{display:flex; align-items:center; justify-content:space-between; padding:16px 16px 10px;}
-.tabs{position:fixed; bottom:0; left:0; right:0; display:flex; background:rgba(0,0,0,.92); backdrop-filter:blur(10px); border-top:1px solid var(--border); z-index:50; max-width:760px; margin:0 auto;}
-.tabs button{flex:1; padding:10px 0 7px; text-align:center; color:var(--tx2); display:flex; flex-direction:column; align-items:center;}
-.tabs button.on{color:var(--tx);}
-.tabs svg{width:26px; height:26px;}
-.tabs .ind{width:28px; height:3px; border-radius:9999px; background:transparent; margin-top:5px;}
-.tabs button.on .ind{background:var(--ac);}
-.wrap{padding:0 14px 20px;}
-.card{background:var(--card); border:1px solid var(--border); border-radius:var(--r); padding:15px; margin-bottom:12px;}
-.rcard{display:flex; align-items:center; gap:12px; cursor:pointer;}
-.rcard{transition:border-color .15s, transform .1s;}
-.rcard:active{transform:scale(.985); border-color:var(--border2);}
-.rcard .dot{width:46px; height:46px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:1.35rem; flex-shrink:0; box-shadow:0 3px 12px rgba(0,0,0,.5);}
-.rcard h3{margin-top:1px;}
-.icobtn{width:38px; height:38px; border-radius:50%; border:1px solid var(--border); color:var(--tx2); display:flex; align-items:center; justify-content:center; font-size:1.02rem; flex-shrink:0; transition:.15s;}
-.icobtn:active{background:var(--card2); color:var(--tx); transform:scale(.92);}
+select{appearance:none; -webkit-appearance:none; padding-right:30px;
+  background-image:url("data:image/svg+xml;charset=utf8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%23bfc8ce'%3E%3Cpath d='M7 10l5 5 5-5z'/%3E%3C/svg%3E");
+  background-repeat:no-repeat; background-position:right 6px center; background-size:20px;}
+/* ---- escala tipográfica de M3 ---- */
+h1{font-size:1.375rem; line-height:1.75rem; font-weight:500; letter-spacing:0;}
+h2{font-size:1.25rem; line-height:1.75rem; font-weight:500; letter-spacing:0;}
+h3{font-size:1rem; line-height:1.5rem; font-weight:500; letter-spacing:.009em;}
+.t-body{font-size:.875rem; line-height:1.25rem; letter-spacing:.016em;}
+.t-label{font-size:.75rem; line-height:1rem; font-weight:500; letter-spacing:.031em;}
+/* ---- ripple (respuesta táctil de M3) ---- */
+.rip{position:absolute; border-radius:50%; background:currentColor; opacity:.16; pointer-events:none;
+  transform:scale(0); animation:rip var(--d-l) var(--e-std) forwards;}
+@keyframes rip{to{transform:scale(1); opacity:0;}}
+/* capa de estado: M3 superpone el color de contenido al 8/10% en hover/pressed */
+.sl{position:relative; overflow:hidden; isolation:isolate;}
+.sl::after{content:''; position:absolute; inset:0; background:currentColor; opacity:0; pointer-events:none;
+  transition:opacity var(--d-s) var(--e-std);}
+.sl:active::after{opacity:.1;}
+/* ---- top app bar ---- */
+.hdr{display:flex; align-items:center; justify-content:space-between; gap:8px; padding:8px 4px 8px 16px; min-height:64px;}
+.hdr h1{white-space:nowrap; overflow:hidden; text-overflow:ellipsis;}
+/* ---- navigation bar (M3) ---- */
+.tabs{position:fixed; bottom:0; left:0; right:0; display:flex; height:80px; padding-top:12px; z-index:50;
+  background:var(--sc); max-width:760px; margin:0 auto;
+  padding-bottom:env(safe-area-inset-bottom,0px);}
+.tabs button{flex:1; display:flex; flex-direction:column; align-items:center; gap:4px; color:var(--on-surface-var);}
+.tabs .ind{width:64px; height:32px; border-radius:var(--r-full); display:flex; align-items:center; justify-content:center;
+  position:relative; overflow:hidden; transition:background var(--d-m) var(--e-emph), color var(--d-m) var(--e-emph);}
+.tabs button.on{color:var(--on-surface);}
+.tabs button.on .ind{background:var(--secondary-c); color:var(--on-secondary-c); animation:indIn var(--d-m) var(--e-emph-dec);}
+@keyframes indIn{from{transform:scaleX(.35); opacity:.4;} to{transform:scaleX(1); opacity:1;}}
+.tabs svg{width:24px; height:24px;}
+.tabs .lb{font-size:.75rem; line-height:1rem; font-weight:500; letter-spacing:.031em;}
+.tabs button.on .lb{font-weight:700;}
+.wrap{padding:0 16px 20px;}
+/* ---- cards ---- */
+.card{background:var(--sc-low); border-radius:var(--r-m); padding:16px; margin-bottom:12px; box-shadow:var(--el1);}
+.rcard{display:flex; align-items:center; gap:16px; cursor:pointer; transition:transform var(--d-s) var(--e-emph);}
+.rcard:active{transform:scale(.985);}
+.rcard .dot{width:44px; height:44px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:1.35rem; flex-shrink:0;}
 .rcard .meta{flex:1; min-width:0;}
-.rcard .meta small{color:var(--tx2); display:block; margin-bottom:2px;}
-.btn{background:var(--acg); color:#fff; border-radius:9999px; padding:12px 20px; font-weight:700; display:inline-flex; align-items:center; gap:7px; justify-content:center; letter-spacing:.1px; box-shadow:0 4px 14px rgba(29,155,240,.28); transition:transform .1s, box-shadow .15s, background .15s;}
-.btn:active{transform:scale(.96); box-shadow:0 2px 8px rgba(29,155,240,.22);}
-@media (hover:hover){.btn:hover{box-shadow:0 6px 20px rgba(29,155,240,.4);} .btn.ghost:hover{background:rgba(255,255,255,.06); border-color:var(--border2);} .chip:hover{border-color:var(--border2);} .mitem:hover,.menu button:hover,.opt:hover{background:var(--card2);} .icobtn:hover{color:var(--tx); border-color:var(--border2);}}
+.rcard .meta small{color:var(--on-surface-var); display:block; margin:2px 0; font-size:.75rem; line-height:1rem; letter-spacing:.031em;}
+/* texto de apoyo de un list item: una sola línea con puntos suspensivos */
+.rcard .meta small.sub{white-space:nowrap; overflow:hidden; text-overflow:ellipsis; margin-bottom:0;}
+/* ---- icon button (M3) ---- */
+.icobtn{width:48px; height:48px; border-radius:50%; border:none; color:var(--on-surface-var); background:none;
+  display:flex; align-items:center; justify-content:center; font-size:1.05rem; flex-shrink:0;}
+/* ---- botones (M3: filled / outlined / text) ---- */
+.btn{background:var(--primary); color:var(--on-primary); border-radius:var(--r-full); min-height:40px; padding:10px 24px;
+  font-size:.875rem; font-weight:500; letter-spacing:.006em; display:inline-flex; align-items:center; gap:8px;
+  justify-content:center; transition:box-shadow var(--d-s) var(--e-std), transform var(--d-s) var(--e-emph);}
+.btn:active{transform:scale(.97);}
 .btn.full{width:100%;}
-.btn.ghost{background:transparent; border:1px solid var(--border2); color:var(--tx); box-shadow:none;}
-.btn.danger{background:transparent; border:1px solid rgba(244,33,46,.55); color:var(--bad); box-shadow:none;}
+.btn.ghost{background:transparent; border:1px solid var(--outline); color:var(--primary);}
+.btn.danger{background:transparent; border:1px solid var(--outline); color:var(--error);}
+.btn.tonal{background:var(--secondary-c); color:var(--on-secondary-c);}
+.btn.sm{min-height:32px; padding:6px 16px; font-size:.8125rem;}
+/* FAB extendido: la acción principal de la pantalla */
+.fab{--fy:0px; position:fixed; right:16px; bottom:96px; z-index:55; display:inline-flex; align-items:center; gap:12px;
+  min-height:56px; padding:0 20px; border-radius:var(--r-l); background:var(--primary-c); color:var(--on-primary-c);
+  box-shadow:var(--el3); font-size:.875rem; font-weight:600; letter-spacing:.006em;
+  animation:fabIn var(--d-l) var(--e-emph-dec) backwards;
+  transform:translateY(var(--fy)); transition:transform var(--d-m) var(--e-emph);}
+.fab:active{transform:translateY(var(--fy)) scale(.94);}
+/* cuando aparece un snackbar el FAB sube, como en Android */
+body.snack .fab{--fy:-68px;}
+.fab svg{width:24px; height:24px;}
+@keyframes fabIn{from{transform:scale(.5) translateY(20px); opacity:0;} to{transform:scale(1) translateY(0); opacity:1;}}
+@media (hover:hover){
+  .btn:hover{box-shadow:var(--el1);} .fab:hover{box-shadow:var(--el3);}
+  .sl:hover::after{opacity:.08;}
+}
+.btn.full{width:100%;}
+.btn.ghost{background:transparent; border:1px solid var(--outline); color:var(--on-surface); box-shadow:none;}
+.btn.danger{background:transparent; border:1px solid rgba(244,33,46,.55); color:var(--error); box-shadow:none;}
 .btn.sm{padding:7px 14px; font-size:.85rem;}
-.lbl{display:block; font-size:.78rem; color:var(--tx2); margin:16px 0 7px; font-weight:700; text-transform:uppercase; letter-spacing:.5px;}
+/* subencabezado de sección: en M3 va en caja baja, no en mayúsculas */
+.lbl{display:block; font-size:.875rem; line-height:1.25rem; color:var(--primary); margin:20px 0 10px; font-weight:500; letter-spacing:.006em;}
 .lbl:first-child{margin-top:0;}
 .chips{display:flex; flex-wrap:wrap; gap:8px;}
-.chip{padding:8px 15px; border-radius:9999px; background:transparent; border:1px solid var(--border); color:var(--tx); font-size:.85rem; transition:.15s;}
-.chip:active{transform:scale(.94);}
-.chip.on{background:var(--ac); border-color:var(--ac); color:#fff; font-weight:700;}
-.chip.exc{background:var(--bad); border-color:var(--bad); color:#fff; font-weight:700;}
-.xtabs{display:flex; border-bottom:1px solid var(--border);}
-.xtabs button{flex:1; padding:4px 4px 0; color:var(--tx2); font-weight:700; font-size:.88rem;}
-.xtabs button span{display:inline-block; position:relative; padding:6px 2px 10px;}
-.xtabs button.on{color:var(--tx);}
-.xtabs button.on span:after{content:''; position:absolute; left:0; right:0; bottom:0; height:4px; border-radius:9999px; background:var(--ac);}
-.row{display:flex; gap:10px; align-items:center;}
-.hint{font-size:.78rem; color:var(--tx3); margin-top:6px; line-height:1.45;}
-/* tabla de rutina */
+/* ---- filter chips (M3): al seleccionarse aparece el check, como en Android ---- */
+.chip{display:inline-flex; align-items:center; gap:6px; height:32px; padding:0 16px; border-radius:var(--r-s);
+  background:transparent; border:1px solid var(--outline); color:var(--on-surface-var); font-size:.875rem; font-weight:500;
+  letter-spacing:.006em; transition:background var(--d-s) var(--e-std), border-color var(--d-s) var(--e-std), color var(--d-s) var(--e-std);}
+.chip.on{background:var(--secondary-c); border-color:transparent; color:var(--on-secondary-c); padding-left:8px;}
+.chip.exc{background:var(--error-c); border-color:transparent; color:var(--on-error-c); padding-left:8px;}
+.chip.on::before,.chip.exc::before{content:''; width:18px; height:18px; flex-shrink:0; background:currentColor;
+  -webkit-mask:var(--ico-check) center/contain no-repeat; mask:var(--ico-check) center/contain no-repeat;
+  animation:chkIn var(--d-m) var(--e-emph-dec);}
+@keyframes chkIn{from{transform:scale(0) rotate(-45deg); opacity:0;} to{transform:scale(1) rotate(0); opacity:1;}}
+/* ---- segmented buttons (M3) ---- */
+.xtabs{display:flex; border:1px solid var(--outline); border-radius:var(--r-full); overflow:hidden;}
+.xtabs button{flex:1; height:40px; color:var(--on-surface); font-weight:500; font-size:.875rem; letter-spacing:.006em;
+  transition:background var(--d-s) var(--e-std);}
+.xtabs button+button{border-left:1px solid var(--outline);}
+.xtabs button span{display:inline-flex; align-items:center; gap:6px;}
+.xtabs button.on{background:var(--secondary-c); color:var(--on-secondary-c);}
+.xtabs button.on span::before{content:''; width:18px; height:18px; background:currentColor;
+  -webkit-mask:var(--ico-check) center/contain no-repeat; mask:var(--ico-check) center/contain no-repeat;
+  animation:chkIn var(--d-m) var(--e-emph-dec);}
+.row{display:flex; gap:12px; align-items:center;}
+.hint{font-size:.75rem; line-height:1rem; letter-spacing:.025em; color:var(--on-surface-var); margin-top:8px; line-height:1.5;}
+/* ---- tabla de rutina ---- */
 .dia{margin-bottom:14px;}
-.dia-h{display:flex; align-items:flex-start; justify-content:space-between; padding:14px 15px 10px; border-bottom:1px solid var(--border);}
-.dia-h b{font-weight:800; font-size:1rem;}
-.dia-h small{color:var(--tx2); font-weight:400;}
-.dbar{display:block; width:34px; height:4px; border-radius:9999px; margin-top:6px;}
-.thead,.trow{display:grid; grid-template-columns:minmax(0,1fr) 2.4rem 3.1rem 3.4rem 3rem 1.7rem; gap:5px; align-items:center; padding:6px 9px;}
-.thead{font-size:.68rem; color:var(--tx3); text-transform:uppercase; letter-spacing:.4px; border-bottom:1px solid var(--border); padding-bottom:7px; font-weight:700;}
+.dia-h{display:flex; align-items:flex-start; justify-content:space-between; gap:12px; padding:16px 16px 12px;}
+.dia-h b{font-weight:500; font-size:1rem; line-height:1.5rem;}
+.dia-h small{color:var(--on-surface-var); font-weight:400; font-size:.75rem;}
+.dbar{display:block; width:32px; height:4px; border-radius:var(--r-full); margin-top:8px;}
+/* columnas en px (no rem): así el nombre del ejercicio no pierde ancho en pantallas chicas */
+.thead,.trow{display:grid; grid-template-columns:minmax(0,1fr) 32px 44px 50px 44px 24px; gap:5px; align-items:center; padding:6px 8px;}
+.thead{font-size:.6875rem; color:var(--on-surface-var); text-transform:uppercase; letter-spacing:.045em;
+  border-bottom:1px solid var(--outline-var); padding-bottom:8px; font-weight:500;}
 .thead div{text-align:center;} .thead div:first-child{text-align:left;}
-.trow{border-bottom:1px solid rgba(47,51,54,.55); position:relative;}
+.trow{border-bottom:1px solid var(--outline-var); position:relative;}
 .trow:last-child{border-bottom:none;}
-.trow .nom{font-size:.85rem; line-height:1.25; padding:4px 0; word-wrap:break-word; font-weight:600;}
-.trow .nom small{display:block; color:var(--tx3); font-size:.68rem; margin-top:1px; font-weight:400;}
-.trow input{width:100%; text-align:center; padding:6px 2px; font-size:.85rem; border-radius:8px;}
-.trow input.logv{background:#0a171f; border:1px solid rgba(29,155,240,.25);}
-.menu-btn{color:var(--tx3); font-size:1rem; text-align:center; padding:4px 0; letter-spacing:1px;}
-.menu{position:absolute; right:8px; top:calc(100% - 8px); background:#13171d; border:1px solid var(--border2); border-radius:14px; z-index:30; box-shadow:0 10px 30px rgba(0,0,0,.8); overflow:hidden; min-width:160px;}
-.menu.up{top:auto; bottom:calc(100% - 8px);}
-.menu button{display:block; width:100%; text-align:left; padding:11px 15px; font-size:.85rem; font-weight:600;}
-.menu button:active{background:var(--card2);}
-.addex{width:100%; text-align:center; padding:11px; color:var(--ac); font-size:.88rem; font-weight:600; border-top:1px solid var(--border);}
-/* modal */
-.overlay{position:fixed; inset:0; background:rgba(0,0,0,.62); backdrop-filter:blur(3px); z-index:150; display:flex; align-items:flex-end; justify-content:center;}
-.modal{background:#0b0e12; border:1px solid var(--border2); border-radius:18px 18px 0 0; width:100%; max-width:760px; max-height:82vh; display:flex; flex-direction:column; padding:16px;}
+.trow .nom{font-size:.875rem; line-height:1.25rem; padding:6px 0; word-wrap:break-word; font-weight:500;}
+.trow .nom small{display:block; color:var(--on-surface-var); font-size:.6875rem; margin-top:2px; font-weight:400;}
+.trow input{width:100%; min-width:0; text-align:center; padding:8px 2px; font-size:.8125rem;}
+.trow input.logv{background:var(--primary-c); color:var(--on-primary-c); border-bottom-color:transparent;}
+.trow input.logv::placeholder{color:var(--on-primary-c); opacity:.55;}
+.menu-btn{color:var(--on-surface-var); font-size:1rem; text-align:center; padding:6px 0; letter-spacing:1px; border-radius:50%;}
+/* menú M3: contenedor elevado, esquinas chicas, entrada con escala */
+.menu{position:absolute; right:8px; top:calc(100% - 8px); background:var(--sc-high); border-radius:var(--r-xs);
+  z-index:30; box-shadow:var(--el2); overflow:hidden; min-width:180px; padding:8px 0;
+  transform-origin:top right; animation:menuIn var(--d-s) var(--e-emph-dec);}
+.menu.up{top:auto; bottom:calc(100% - 8px); transform-origin:bottom right;}
+@keyframes menuIn{from{transform:scale(.8); opacity:0;} to{transform:scale(1); opacity:1;}}
+.menu button{display:block; width:100%; text-align:left; padding:0 12px; height:48px; line-height:48px;
+  font-size:.875rem; font-weight:400; letter-spacing:.016em; color:var(--on-surface);}
+.addex{width:100%; padding:14px; color:var(--primary); font-size:.875rem; font-weight:500; letter-spacing:.006em;
+  border-top:1px solid var(--outline-var); display:flex; align-items:center; justify-content:center; gap:8px;}
+/* ---- bottom sheet / diálogos (M3) ---- */
+.overlay{position:fixed; inset:0; background:rgba(0,0,0,.5); z-index:150; display:flex; align-items:flex-end;
+  justify-content:center; animation:fade var(--d-s) var(--e-std);}
+@keyframes fade{from{opacity:0} to{opacity:1}}
+.modal{background:var(--sc-low); border-radius:var(--r-xl) var(--r-xl) 0 0; width:100%; max-width:760px; max-height:82vh;
+  display:flex; flex-direction:column; padding:16px; box-shadow:var(--el3);
+  animation:sheetUp var(--d-m) var(--e-emph-dec);}
+@keyframes sheetUp{from{transform:translateY(100%);} to{transform:translateY(0);}}
+/* manija de arrastre: la marca visual de un bottom sheet de Android */
+.modal::before{content:''; width:32px; height:4px; border-radius:var(--r-full); background:var(--on-surface-var);
+  opacity:.4; margin:-4px auto 12px; flex-shrink:0;}
+/* un diálogo centrado no lleva manija: esa es la marca de un bottom sheet */
+.overlay[style*="center"] .modal{animation:dlgIn var(--d-m) var(--e-emph-dec);}
+.overlay[style*="center"] .modal::before{display:none;}
+@keyframes dlgIn{from{transform:scale(.85); opacity:0;} to{transform:scale(1); opacity:1;}}
 .modal .list{overflow-y:auto; flex:1; margin-top:10px;}
-.spill{border-radius:9999px; padding:10px 18px; width:100%;}
-.mgrp{font-size:.75rem; color:var(--tx2); font-weight:700; text-transform:uppercase; margin:12px 0 4px; letter-spacing:.5px;}
-.mitem{display:block; width:100%; text-align:left; padding:10px; border-radius:10px; font-size:.9rem; font-weight:600;}
-.mitem:active{background:var(--card2);}
-.mitem small{color:var(--tx3); margin-left:6px; font-weight:400;}
-/* colores */
-.cdots{display:flex; gap:9px; flex-wrap:wrap;}
-.cdot{width:32px; height:32px; border-radius:50%; border:3px solid transparent;}
-.cdot.on{border-color:#fff;}
-.edots{display:flex; gap:7px; flex-wrap:wrap;}
-.edot{width:38px; height:38px; border-radius:50%; background:var(--card2); border:1px solid var(--border); font-size:1.15rem; display:flex; align-items:center; justify-content:center;}
-.edot.on{border-color:var(--ac); background:rgba(29,155,240,.2);}
-/* grafico */
+.spill{border-radius:var(--r-full); padding:12px 20px; width:100%; background:var(--sc-high); border:none;}
+.spill:focus{box-shadow:0 0 0 2px var(--primary);}
+.mgrp{font-size:.6875rem; color:var(--primary); font-weight:600; text-transform:uppercase; margin:16px 0 4px; letter-spacing:.045em;}
+.mitem{display:block; width:100%; text-align:left; padding:12px; border-radius:var(--r-s); font-size:.875rem;
+  font-weight:400; letter-spacing:.016em; color:var(--on-surface);}
+.mitem small{color:var(--on-surface-var); margin-left:6px;}
+/* ---- selector de color / emoji ---- */
+.cdots{display:flex; gap:10px; flex-wrap:wrap;}
+.cdot{width:36px; height:36px; border-radius:50%; border:2px solid transparent; transition:transform var(--d-s) var(--e-emph);}
+.cdot.on{border-color:var(--on-surface); transform:scale(1.1);}
+.edots{display:flex; gap:8px; flex-wrap:wrap;}
+.edot{width:40px; height:40px; border-radius:50%; background:var(--sc-high); border:none; font-size:1.15rem;
+  display:flex; align-items:center; justify-content:center; transition:background var(--d-s) var(--e-std), transform var(--d-s) var(--e-emph);}
+.edot.on{background:var(--secondary-c); transform:scale(1.1);}
+/* ---- gráfico ---- */
 .chart-wrap{overflow-x:auto;}
 svg text{font-family:inherit;}
-/* ejercicios screen */
-.exrow{display:flex; align-items:center; justify-content:space-between; padding:10px 4px; border-bottom:1px solid rgba(47,51,54,.55); font-size:.9rem;}
+/* ---- pantalla de ejercicios ---- */
+.exrow{display:flex; align-items:center; justify-content:space-between; gap:12px; min-height:48px; padding:8px 4px;
+  border-bottom:1px solid var(--outline-var); font-size:.875rem; letter-spacing:.016em;}
 .exrow:last-child{border-bottom:none;}
-.exrow small{color:var(--tx3);}
-details{margin-bottom:10px;}
-summary{cursor:pointer; padding:14px 15px; background:var(--card); border:1px solid var(--border); border-radius:var(--r); font-weight:700; list-style:none; display:flex; justify-content:space-between; align-items:center;}
+.exrow small{color:var(--on-surface-var);}
+details{margin-bottom:8px;}
+summary{cursor:pointer; padding:16px; background:var(--sc-low); border-radius:var(--r-m); font-weight:500;
+  list-style:none; display:flex; justify-content:space-between; align-items:center; box-shadow:var(--el1);}
 summary::-webkit-details-marker{display:none;}
-summary .n{color:var(--tx2); font-size:.8rem; font-weight:400;}
-details[open] summary{border-radius:var(--r) var(--r) 0 0; border-bottom:none;}
-details .body{background:var(--card); border:1px solid var(--border); border-top:none; border-radius:0 0 var(--r) var(--r); padding:4px 14px;}
-.back{color:var(--tx2); font-size:.9rem; padding:6px 0; display:inline-flex; align-items:center; gap:5px;}
-.empty{text-align:center; color:var(--tx3); padding:40px 20px; line-height:1.5;}
-.empty .big{font-size:2.6rem; margin-bottom:10px;}
-.toast{position:fixed; bottom:86px; left:50%; transform:translateX(-50%); background:var(--acg); color:#fff; padding:12px 22px; border-radius:9999px; z-index:200; font-size:.88rem; font-weight:700; box-shadow:0 8px 26px rgba(0,0,0,.65); max-width:92vw; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; animation:tup .2s ease-out;}
-@keyframes tup{from{opacity:0; transform:translate(-50%,10px)} to{opacity:1; transform:translate(-50%,0)}}
-/* modo entrenamiento */
-.srow{display:grid; grid-template-columns:3.4rem 1fr 1fr 2.6rem; gap:8px; align-items:center; padding:5px 0;}
-.srow input{width:100%; min-width:0; text-align:center; padding:8px 4px;}
-.chk{width:38px; height:38px; border-radius:50%; border:1px solid var(--border); color:var(--tx3); font-weight:700;}
-.chk.ok{background:var(--ok); border-color:var(--ok); color:#fff;}
-.tbar{position:fixed; bottom:0; left:0; right:0; max-width:760px; margin:0 auto; background:var(--ac); color:#fff; display:flex; justify-content:space-between; align-items:center; padding:10px 16px; z-index:60; font-weight:700;}
-.tbar .btn.ghost{border-color:rgba(255,255,255,.65); color:#fff;}
-/* calendario de actividad */
+summary .n{color:var(--on-surface-var); font-size:.75rem; font-weight:400;}
+details[open] summary{border-radius:var(--r-m) var(--r-m) 0 0; box-shadow:none;}
+details .body{background:var(--sc-low); border-radius:0 0 var(--r-m) var(--r-m); padding:4px 16px 8px;}
+.back{color:var(--on-surface-var); font-size:1.1rem; width:48px; height:48px; border-radius:50%;
+  display:inline-flex; align-items:center; justify-content:center; flex-shrink:0;}
+.empty{text-align:center; color:var(--on-surface-var); padding:48px 24px; line-height:1.6; font-size:.875rem;}
+.empty .big{font-size:2.6rem; margin-bottom:12px; animation:float 3s ease-in-out infinite;}
+@keyframes float{0%,100%{transform:translateY(0)} 50%{transform:translateY(-8px)}}
+/* ---- snackbar (M3) ---- */
+.toast{position:fixed; bottom:100px; left:16px; right:16px; margin:0 auto; max-width:520px; background:var(--inverse-surface);
+  color:var(--inverse-on-surface); padding:14px 16px; border-radius:var(--r-xs); z-index:200; font-size:.875rem;
+  font-weight:500; letter-spacing:.016em; box-shadow:var(--el3); overflow:hidden; text-overflow:ellipsis;
+  white-space:nowrap; animation:snackIn var(--d-m) var(--e-emph-dec);}
+@keyframes snackIn{from{opacity:0; transform:translateY(24px) scale(.9);} to{opacity:1; transform:translateY(0) scale(1);}}
+/* ---- modo entrenamiento ---- */
+.srow{display:grid; grid-template-columns:3.4rem 1fr 1fr 2.6rem; gap:10px; align-items:center; padding:6px 0;}
+.srow input{width:100%; min-width:0; text-align:center; padding:10px 4px;}
+.srow.done input{background:var(--tertiary-c); color:var(--on-tertiary-c); border-bottom-color:transparent;}
+.chk{width:40px; height:40px; border-radius:50%; background:var(--sc-high); color:var(--on-surface-var);
+  display:flex; align-items:center; justify-content:center;
+  transition:background var(--d-s) var(--e-std), color var(--d-s) var(--e-std), transform var(--d-s) var(--e-emph);}
+.chk.ok{background:var(--tertiary); color:var(--on-tertiary); animation:pop var(--d-m) var(--e-emph-dec);}
+@keyframes pop{0%{transform:scale(1)} 45%{transform:scale(1.25)} 100%{transform:scale(1)}}
+.tbar{position:fixed; bottom:0; left:0; right:0; max-width:760px; margin:0 auto; background:var(--sc);
+  display:flex; justify-content:space-between; align-items:center; padding:12px 16px; z-index:60; font-weight:500;}
+/* ---- calendario de actividad ---- */
 .cal{display:flex; gap:3px;}
 .cal .col{display:flex; flex-direction:column; gap:3px; flex:1;}
-.cal i{aspect-ratio:1; border-radius:3px; background:var(--card2); display:block;}
-.cal i.on{background:var(--ac);}
+.cal i{aspect-ratio:1; border-radius:var(--r-xs); background:var(--sc-high); display:block;
+  transition:background var(--d-m) var(--e-std);}
+.cal i.on{background:var(--primary);}
 
 /* ============ v2: componentes nuevos ============ */
 .hdr h1{line-height:1.15;}
-.secc{font-size:.72rem; color:var(--tx2); font-weight:800; text-transform:uppercase; letter-spacing:1.2px; margin:20px 2px 9px;}
+.secc{font-size:.875rem; line-height:1.25rem; color:var(--on-surface-var); font-weight:500; letter-spacing:.006em; margin:20px 4px 10px;}
 /* fila de estadisticas (rutina) */
 .stats{display:grid; grid-template-columns:repeat(4,1fr); gap:8px; margin-bottom:14px;}
-.stat{background:var(--card); border:1px solid var(--border); border-radius:15px; padding:11px 4px 9px; text-align:center;}
-.stat b{display:block; font-size:1.3rem; font-weight:800; letter-spacing:-.8px; line-height:1.1;}
-.stat span{display:block; font-size:.63rem; color:var(--tx2); text-transform:uppercase; letter-spacing:.6px; margin-top:3px; font-weight:700;}
+.stat{background:var(--sc-low); border-radius:var(--r-m); padding:14px 4px 12px; text-align:center; box-shadow:var(--el1);}
+.stat b{display:block; font-size:1.5rem; font-weight:400; line-height:2rem; color:var(--primary);}
+.stat span{display:block; font-size:.6875rem; color:var(--on-surface-var); letter-spacing:.045em; margin-top:2px; font-weight:500;}
 .stat .ic{font-size:.95rem; opacity:.85;}
-/* ---- CRONOMETRO GRANDE ---- */
+/* ---- CRONÓMETRO: bottom sheet con indicador circular determinado (M3) ---- */
 .tpanel{position:fixed; left:0; right:0; bottom:0; max-width:760px; margin:0 auto; z-index:120;
-  background:rgba(7,9,12,.97); backdrop-filter:blur(18px); border-top:2px solid var(--ac);
-  border-radius:24px 24px 0 0; box-shadow:0 -12px 40px rgba(0,0,0,.85);
-  padding:0 16px calc(16px + env(safe-area-inset-bottom,0px)); animation:tsub .22s cubic-bezier(.2,.9,.3,1);}
-.tpanel.contabs{bottom:65px; padding-bottom:16px;}
-@keyframes tsub{from{transform:translateY(88%)} to{transform:translateY(0)}}
-.tprog{height:4px; background:#1b2027; border-radius:9999px; margin:12px 0 8px; overflow:hidden;}
-.tprog i{display:block; height:100%; background:var(--acg); border-radius:9999px; transition:width .25s linear;}
-.thead2{display:flex; justify-content:space-between; align-items:center; font-size:.7rem; font-weight:800; letter-spacing:1.6px; text-transform:uppercase; color:var(--ac2);}
-.tnum{font-size:clamp(3.4rem,19vw,5rem); font-weight:800; letter-spacing:-3px; line-height:1; text-align:center; font-variant-numeric:tabular-nums; margin:2px 0 4px;}
-.tsub{text-align:center; font-size:.78rem; color:var(--tx2); margin-bottom:14px;}
+  background:var(--sc-high); border-radius:var(--r-xl) var(--r-xl) 0 0; box-shadow:var(--el3);
+  padding:0 16px calc(16px + env(safe-area-inset-bottom,0px)); animation:sheetUp var(--d-m) var(--e-emph-dec);}
+.tpanel.contabs{bottom:80px; padding-bottom:16px;}
+.tpanel::before{content:''; display:block; width:32px; height:4px; border-radius:var(--r-full);
+  background:var(--on-surface-var); opacity:.4; margin:12px auto 4px;}
+.thead2{display:flex; justify-content:space-between; align-items:center; font-size:.6875rem; font-weight:600;
+  letter-spacing:.045em; text-transform:uppercase; color:var(--primary);}
+.tring{position:relative; width:180px; height:180px; margin:10px auto 6px;}
+.tring svg{width:100%; height:100%; transform:rotate(-90deg);}
+.tring .bg{fill:none; stroke:var(--sc-highest); stroke-width:12;}
+.tring .fg{fill:none; stroke:var(--primary); stroke-width:12; stroke-linecap:round; transition:stroke-dashoffset .25s linear, stroke var(--d-m) var(--e-std);}
+.tring .tnum{position:absolute; inset:0; display:flex; align-items:center; justify-content:center;}
+.tnum{font-size:3rem; font-weight:400; line-height:1; text-align:center; font-variant-numeric:tabular-nums;}
+.tsub{text-align:center; font-size:.875rem; color:var(--on-surface-var); margin-bottom:16px; letter-spacing:.016em;}
 .trow2{display:flex; gap:8px;}
-.tbtn{flex:1; padding:14px 2px; border-radius:15px; background:var(--card2); border:1px solid var(--border); font-weight:700; font-size:.84rem; transition:.12s;}
-.tbtn:active{transform:scale(.94); background:#232830;}
-.tbtn.pri{background:var(--acg); border-color:transparent; color:#fff; box-shadow:0 4px 14px rgba(29,155,240,.3);}
-.tpanel.fin{border-top-color:var(--ok);}
-.tpanel.fin .tnum{color:var(--ok);}
-.tpanel.fin .tprog i{background:var(--ok);}
+.tbtn{flex:1; min-height:48px; padding:12px 2px; border-radius:var(--r-full); background:var(--sc-highest);
+  color:var(--on-surface); font-weight:500; font-size:.8125rem; letter-spacing:.006em;
+  transition:transform var(--d-s) var(--e-emph);}
+.tbtn:active{transform:scale(.94);}
+.tbtn.pri{background:var(--primary); color:var(--on-primary);}
+.tpanel.fin .fg,.tpanel.fin .tnum{stroke:var(--tertiary); color:var(--tertiary);}
 .tpanel.warn .tnum{color:var(--warn);}
+.tpanel.warn .fg{stroke:var(--warn);}
 /* aviso visual fuerte cuando no hay permiso de notificaciones */
-.flash{position:fixed; inset:0; z-index:400; pointer-events:none; background:var(--ok); animation:fl .42s ease-in-out 3;}
+.flash{position:fixed; inset:0; z-index:400; pointer-events:none; background:var(--tertiary); animation:fl .42s ease-in-out 3;}
 @keyframes fl{0%,100%{opacity:0} 45%{opacity:.5}}
-/* ---- PROGRESO FISICO ---- */
-.mgrid{display:grid; grid-template-columns:1fr 1fr; gap:10px;}
-.mgrid input{width:100%; text-align:center; font-size:1.35rem; font-weight:800; padding:12px 6px; letter-spacing:-.5px;}
-.mgrid .u{display:block; text-align:center; font-size:.68rem; color:var(--tx2); text-transform:uppercase; letter-spacing:.8px; font-weight:700; margin-bottom:6px;}
-.imc{display:flex; align-items:baseline; gap:9px; flex-wrap:wrap;}
-.imc b{font-size:2.3rem; font-weight:800; letter-spacing:-1.5px; line-height:1;}
-.bar{height:9px; border-radius:9999px; margin-top:12px; position:relative;
-  background:linear-gradient(90deg,#4da3ff 0 14%,#00ba7c 14% 40%,#ffb020 40% 60%,#f4212e 60%);}
-.bar i{position:absolute; top:-5px; width:4px; height:19px; border-radius:2px; background:#fff; box-shadow:0 0 0 2px #000, 0 0 8px rgba(255,255,255,.6); transform:translateX(-2px);}
-.barl{display:flex; justify-content:space-between; font-size:.62rem; color:var(--tx3); margin-top:6px; font-weight:600;}
-.mrow{display:grid; grid-template-columns:3.5rem 1fr 1fr 1fr 1.5rem; gap:6px; align-items:center; padding:10px 2px; border-bottom:1px solid rgba(37,43,50,.9); font-size:.86rem;}
+/* ---- PROGRESO FÍSICO ---- */
+.mgrid{display:grid; grid-template-columns:1fr 1fr; gap:12px;}
+.mgrid input{width:100%; text-align:center; font-size:1.75rem; font-weight:400; padding:14px 6px;}
+.mgrid .u{display:block; text-align:center; font-size:.6875rem; color:var(--on-surface-var); letter-spacing:.045em; font-weight:500; margin-bottom:6px;}
+.imc{display:flex; align-items:baseline; gap:10px; flex-wrap:wrap;}
+.imc b{font-size:2.25rem; font-weight:400; line-height:2.75rem; color:var(--primary);}
+.bar{height:10px; border-radius:var(--r-full); margin-top:14px; position:relative; overflow:visible;
+  background:linear-gradient(90deg,#7fb8ff 0 14%,var(--tertiary) 14% 40%,var(--warn) 40% 60%,var(--error) 60%);}
+.bar i{position:absolute; top:-5px; width:4px; height:20px; border-radius:var(--r-full); background:var(--on-surface);
+  box-shadow:0 0 0 3px var(--sc-low); transform:translateX(-2px); transition:left var(--d-l) var(--e-emph);}
+.barl{display:flex; justify-content:space-between; font-size:.6875rem; color:var(--on-surface-var); margin-top:8px; font-weight:500;}
+.mrow{display:grid; grid-template-columns:3.2rem 1fr 1fr 1fr 2.5rem; gap:8px; align-items:center; min-height:48px;
+  padding:8px 2px; border-bottom:1px solid var(--outline-var); font-size:.875rem; letter-spacing:.016em;}
 .mrow:last-child{border-bottom:none;}
-.mrow .d{color:var(--tx3); font-size:.74rem; font-weight:600;}
-.mrow b{font-weight:700; font-variant-numeric:tabular-nums;}
+.mrow .d{color:var(--on-surface-var); font-size:.75rem; font-weight:500;}
+.mrow b{font-weight:500; font-variant-numeric:tabular-nums;}
 .mrow .c{text-align:center;}
-.sube{color:var(--warn); font-size:.74rem; font-weight:700;}
-.baja{color:var(--ok); font-size:.74rem; font-weight:700;}
-.mhead{display:grid; grid-template-columns:3.5rem 1fr 1fr 1fr 1.5rem; gap:6px; padding:0 2px 7px; border-bottom:1px solid var(--border); font-size:.63rem; color:var(--tx3); text-transform:uppercase; letter-spacing:.5px; font-weight:700;}
+.sube{color:var(--warn); font-size:.75rem; font-weight:500;}
+.baja{color:var(--tertiary); font-size:.75rem; font-weight:500;}
+.mhead{display:grid; grid-template-columns:3.2rem 1fr 1fr 1fr 2.5rem; gap:8px; padding:0 2px 8px;
+  border-bottom:1px solid var(--outline-var); font-size:.6875rem; color:var(--on-surface-var);
+  text-transform:uppercase; letter-spacing:.045em; font-weight:500;}
 .mhead div{text-align:center;} .mhead div:first-child{text-align:left;}
-/* pegar rutina */
-.opt{display:block; width:100%; text-align:left; padding:13px 14px; border-radius:14px; background:var(--card2); border:1px solid var(--border); margin-bottom:8px; font-weight:700; transition:.12s;}
-.opt:active{transform:scale(.98); border-color:var(--ac);}
-.opt small{display:block; color:var(--tx2); font-weight:400; margin-top:2px; font-size:.78rem;}
+/* ---- pegar rutina ---- */
+.opt{display:block; width:100%; text-align:left; padding:16px; border-radius:var(--r-m); background:var(--sc-high);
+  margin-bottom:8px; font-weight:500; font-size:.875rem; transition:transform var(--d-s) var(--e-emph);}
+.opt:active{transform:scale(.98);}
+.opt small{display:block; color:var(--on-surface-var); font-weight:400; margin-top:4px; font-size:.75rem; line-height:1rem;}
+
+/* ============ MOVIMIENTO ============ */
+/* entrada escalonada de listas: cada elemento entra un toque después del anterior */
+.stagger>*{animation:enter var(--d-m) var(--e-emph-dec) backwards;}
+.stagger>*:nth-child(1){animation-delay:0ms}   .stagger>*:nth-child(2){animation-delay:30ms}
+.stagger>*:nth-child(3){animation-delay:60ms}  .stagger>*:nth-child(4){animation-delay:90ms}
+.stagger>*:nth-child(5){animation-delay:120ms} .stagger>*:nth-child(6){animation-delay:150ms}
+.stagger>*:nth-child(n+7){animation-delay:180ms}
+@keyframes enter{from{opacity:0; transform:translateY(14px);} to{opacity:1; transform:translateY(0);}}
+/* celebración de PR */
+.pr-pop{animation:prPop var(--d-l) var(--e-emph-dec);}
+@keyframes prPop{0%{transform:scale(1)} 35%{transform:scale(1.12)} 100%{transform:scale(1)}}
+/* transición entre pantallas (View Transitions API, Chrome Android) */
+@media (prefers-reduced-motion:reduce){
+  *,*::before,*::after{animation-duration:.01ms !important; animation-iteration-count:1 !important;
+    transition-duration:.01ms !important;}
+}
+::view-transition-old(root){animation:vtOut var(--d-s) var(--e-emph-acc) both;}
+::view-transition-new(root){animation:vtIn var(--d-m) var(--e-emph-dec) both;}
+@keyframes vtOut{to{opacity:0; transform:scale(.96);}}
+@keyframes vtIn{from{opacity:0; transform:scale(1.03);} to{opacity:1; transform:scale(1);}}
 </style>
 </head>
 <body>
@@ -497,63 +647,106 @@ function pintarApp(){
   else if(vista.p==='sesion') app.innerHTML=vSesion();
   if(vista.p!=='sesion') app.innerHTML+=vTabs();
   app.innerHTML+=timerHtml();   // el cronometro se ve desde cualquier pantalla
-  document.body.classList.toggle('crono',timerActivo());
+  ajustarEspacioCrono();
 }
-function render(){ menuAbierto=null; pintarApp(); window.scrollTo(0,0); }
+/* La nav bar y el cronómetro son `position:fixed` y tapan el final de la página.
+   OJO: reservar el espacio con `padding-bottom` en <body> NO funciona — no extiende
+   el alto scrolleable, así que el último contenido queda inalcanzable. Por eso metemos
+   un espaciador real dentro del contenido, medido contra el panel (que cambia de alto). */
+function ajustarEspacioCrono(){
+  const app=document.getElementById('app');
+  const tp=document.querySelector('.tpanel');
+  const enSesion=vista.p==='sesion';
+  const alto=(enSesion?0:80)+(tp?tp.offsetHeight:0)+16;   // nav bar + cronómetro + aire
+  const sp=document.createElement('div');
+  sp.style.cssText='height:'+alto+'px;flex-shrink:0';
+  app.appendChild(sp);
+}
+/* render() = cambio de pantalla: usa View Transitions para el fundido entre vistas.
+   rerender() = actualización en el lugar (tipeo, toggles): siempre directo, porque una
+   transición acá pelearía con el foco del input y se sentiría lento. */
+const menosMovimiento=()=>window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+function render(){
+  menuAbierto=null;
+  const pintar=()=>{ pintarApp(); window.scrollTo(0,0); };
+  if(document.startViewTransition&&!menosMovimiento()) document.startViewTransition(pintar);
+  else pintar();
+}
 function rerender(){ const y=window.scrollY; pintarApp(); window.scrollTo(0,y); }
+/* Ripple: la respuesta táctil de Material. Se dibuja donde tocaste y se expande. */
+document.addEventListener('pointerdown',e=>{
+  const el=e.target.closest('.sl');
+  if(!el||menosMovimiento()) return;
+  const r=el.getBoundingClientRect();
+  const d=Math.max(r.width,r.height)*2;
+  const s=document.createElement('span');
+  s.className='rip';
+  s.style.cssText=`width:${d}px;height:${d}px;left:${e.clientX-r.left-d/2}px;top:${e.clientY-r.top-d/2}px`;
+  el.appendChild(s);
+  setTimeout(()=>s.remove(),500);
+});
+/* Navigation bar de M3: el ícono activo va relleno dentro de una píldora indicadora,
+   el inactivo va en contorno. Es la señal visual que usa Android para "dónde estoy". */
 function vTabs(){
-  const icoCasa='<svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 1.7L.6 8.8l1.06 1.7L3 9.68V19.5C3 20.88 4.12 22 5.5 22h13c1.38 0 2.5-1.12 2.5-2.5V9.68l1.34.82 1.06-1.7L12 1.7zm0 14.8c-1.93 0-3.5-1.57-3.5-3.5S10.07 9.5 12 9.5s3.5 1.57 3.5 3.5-1.57 3.5-3.5 3.5z"/></svg>';
-  const icoPesa='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M6.5 6.5v11M2.8 9.5v5M17.5 6.5v11M21.2 9.5v5M6.5 12h11"/></svg>';
-  const icoCuerpo='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20V13M9.5 20V5M15 20V10M20.5 20V15"/></svg>';
-  const ej=vista.p==='ejercicios', cu=vista.p==='cuerpo';
+  const casa=a=>a?'<svg viewBox="0 0 24 24" fill="currentColor"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></svg>'
+                 :'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linejoin="round"><path d="M5 20v-8.5L12 5l7 6.5V20h-5v-6h-4v6z"/></svg>';
+  const pesa=a=>`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="${a?2.6:1.9}" stroke-linecap="round"><path d="M6.5 6.5v11M2.8 9.5v5M17.5 6.5v11M21.2 9.5v5M6.5 12h11"/></svg>`;
+  const cuerpo=a=>a?'<svg viewBox="0 0 24 24" fill="currentColor"><path d="M3 18h3v4H3zm5.5-8h3v12h-3zM14 13h3v9h-3zm5.5-9h3v18h-3z"/></svg>'
+                   :'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linejoin="round"><path d="M3.5 18.5h2v3h-2zm5.5-8h2v11H9zm5.5 3h2v8h-2zm5.5-9h2v17h-2z"/></svg>';
+  const ej=vista.p==='ejercicios', cu=vista.p==='cuerpo', ini=!ej&&!cu;
+  const tab=(activo,ico,lb,destino)=>`<button class="${activo?'on':''}" aria-label="${lb}" onclick="ir('${destino}')">
+      <span class="ind sl">${ico(activo)}</span><span class="lb">${lb}</span></button>`;
   return `<nav class="tabs">
-    <button class="${!ej&&!cu?'on':''}" aria-label="Inicio" onclick="ir('inicio')">${icoCasa}<span class="ind"></span></button>
-    <button class="${ej?'on':''}" aria-label="Ejercicios" onclick="ir('ejercicios')">${icoPesa}<span class="ind"></span></button>
-    <button class="${cu?'on':''}" aria-label="Mi progreso físico" onclick="ir('cuerpo')">${icoCuerpo}<span class="ind"></span></button>
+    ${tab(ini,casa,'Inicio','inicio')}
+    ${tab(ej,pesa,'Ejercicios','ejercicios')}
+    ${tab(cu,cuerpo,'Progreso','cuerpo')}
   </nav>`;
 }
 function ir(p){ vista={p}; render(); }
 
+/* iconografía de la top app bar (Material Symbols) */
+const icoCerrar='<svg viewBox="0 0 24 24" fill="currentColor" style="width:24px;height:24px"><path d="M19 6.4 17.6 5 12 10.6 6.4 5 5 6.4l5.6 5.6L5 17.6 6.4 19l5.6-5.6 5.6 5.6 1.4-1.4-5.6-5.6z"/></svg>';
+const icoAtras='<svg viewBox="0 0 24 24" fill="currentColor" style="width:24px;height:24px"><path d="M20 11H7.8l5.6-5.6L12 4l-8 8 8 8 1.4-1.4L7.8 13H20z"/></svg>';
 /* ---- INICIO ---- */
 const icoCopiar='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:17px;height:17px"><rect x="9" y="9" width="11.5" height="11.5" rx="2.5"/><path d="M5.5 15H5a2 2 0 0 1-2-2V5.5a2 2 0 0 1 2-2H13a2 2 0 0 1 2 2V6"/></svg>';
+const icoPegar='<svg viewBox="0 0 24 24" fill="currentColor" style="width:22px;height:22px"><path d="M19 2h-4.2a3 3 0 0 0-5.6 0H5a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V4a2 2 0 0 0-2-2m-7 0a1 1 0 1 1 0 2 1 1 0 0 1 0-2m7 18H5V4h2v3h10V4h2z"/></svg>';
 function vInicio(){
   let cards;
   if(!S.rutinas.length){
-    cards=`<div class="empty"><div class="big">🏋️</div>Todavía no tenés rutinas.<br>Creá la primera con el botón de arriba.</div>`;
+    cards=`<div class="empty"><div class="big">🏋️</div>Todavía no tenés rutinas.<br>Creá la primera con el botón de abajo.</div>`;
   }else{
-    cards='<div class="secc">Mis rutinas</div>'+S.rutinas.map(r=>{
+    cards='<div class="secc">Mis rutinas</div><div class="stagger">'+S.rutinas.map(r=>{
       const ses=(r.sesiones||[]).length;
-      return `<div class="card rcard" onclick="abrirRutina('${r.id}')">
+      return `<div class="card rcard sl" onclick="abrirRutina('${r.id}')">
         <div class="dot" style="background:${r.color}">${r.emoji}</div>
         <div class="meta">
-          <small>${r.split} · ${r.dias.length} días${ses?' · '+ses+(ses===1?' entreno':' entrenos'):' · creada '+fFecha(r.creada)}</small>
           <h3>${esc(r.nombre)}</h3>
+          <small class="sub">${r.split} · ${r.dias.length} días${ses?' · '+ses+(ses===1?' entreno':' entrenos'):' · creada '+fFecha(r.creada)}</small>
         </div>
-        <button class="icobtn" aria-label="Copiar rutina" title="Copiar rutina" onclick="event.stopPropagation();copiarRutina('${r.id}')">${icoCopiar}</button>
-        <span style="color:var(--tx3)">›</span>
-      </div>`;}).join('');
+        <button class="icobtn sl" aria-label="Copiar rutina" title="Copiar rutina" onclick="event.stopPropagation();copiarRutina('${r.id}')">${icoCopiar}</button>
+      </div>`;}).join('')+'</div>';
   }
-  return `<div class="hdr"><h1>Mis Rutinas</h1></div>
+  return `<div class="hdr"><h1>Mis Rutinas</h1>
+    <button class="icobtn sl" aria-label="Pegar rutina" title="Pegar rutina" onclick="abrirPegar()">${icoPegar}</button>
+  </div>
   <div class="wrap">
     ${bannerSesion()}
     ${bannerInstalar()}
     ${bannerRespaldo()}
-    <div class="row">
-      <button class="btn" style="flex:1" onclick="irCrear()">＋ Nueva rutina</button>
-      <button class="btn ghost" aria-label="Pegar rutina" onclick="abrirPegar()">📥 Pegar</button>
-    </div>
-    ${portapapeles?`<p class="hint" style="text-align:center">Copiada: <b>${esc(portapapeles.nombre||'Rutina')}</b> — tocá <b>Pegar</b> para usarla</p>`:''}
-    <div style="height:14px"></div>
+    ${portapapeles?`<p class="hint" style="text-align:center">Copiada: <b>${esc(portapapeles.nombre||'Rutina')}</b> — tocá el ícono de pegar arriba para usarla</p>`:''}
     ${cards}
     ${vCalendario()}
     <div style="height:18px"></div>
     <div class="row">
-      <button class="btn ghost sm" style="flex:1" onclick="exportar()">Exportar respaldo</button>
-      <button class="btn ghost sm" style="flex:1" onclick="document.getElementById('impfile').click()">Importar</button>
+      <button class="btn ghost sm sl" style="flex:1" onclick="exportar()">Exportar respaldo</button>
+      <button class="btn ghost sm sl" style="flex:1" onclick="document.getElementById('impfile').click()">Importar</button>
       <input type="file" id="impfile" accept=".json" style="display:none" onchange="importar(this)">
     </div>
     <p class="hint" style="text-align:center">El respaldo descarga un archivo .json con todas tus rutinas, historial y ejercicios.</p>
-  </div>`;
+  </div>
+  <button class="fab sl" onclick="irCrear()">
+    <svg viewBox="0 0 24 24" fill="currentColor"><path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6z"/></svg>Nueva rutina
+  </button>`;
 }
 function abrirRutina(id){ vista={p:'rutina',rid:id,cfg:false,chartEx:null}; render(); }
 function irCrear(){
@@ -564,41 +757,42 @@ function irCrear(){
 /* ---- CREAR ---- */
 function vCrear(){
   const f=formCrear;
-  const chipDia=d=>`<button class="chip ${f.diasSem.includes(d)?'on':''}" onclick="togDia('${d}')">${d.slice(0,3)}</button>`;
-  const chipMus=m=>`<button class="chip ${f.prios.includes(m)?'on':''}" onclick="togPrio('${m}')">${m}</button>`;
-  const chipInc=id=>{const e=exPorId(id);return e?`<button class="chip on" onclick="quitarInc('${id}')">${esc(e.nombre)} ✕</button>`:'';};
-  const chipExc=id=>{const e=exPorId(id);return e?`<button class="chip exc" onclick="quitarExc('${id}')">${esc(e.nombre)} ✕</button>`:'';};
-  return `<div class="hdr"><h1>Nueva rutina</h1><button class="back" onclick="ir('inicio')">✕ Cancelar</button></div>
+  const chipDia=d=>`<button class="chip sl ${f.diasSem.includes(d)?'on':''}" onclick="togDia('${d}')">${d.slice(0,3)}</button>`;
+  const chipMus=m=>`<button class="chip sl ${f.prios.includes(m)?'on':''}" onclick="togPrio('${m}')">${m}</button>`;
+  const chipInc=id=>{const e=exPorId(id);return e?`<button class="chip on sl" onclick="quitarInc('${id}')">${esc(e.nombre)} ✕</button>`:'';};
+  const chipExc=id=>{const e=exPorId(id);return e?`<button class="chip exc sl" onclick="quitarExc('${id}')">${esc(e.nombre)} ✕</button>`:'';};
+  return `<div class="hdr"><h1>Nueva rutina</h1>
+    <button class="back sl" aria-label="Cancelar" title="Cancelar" onclick="ir('inicio')">${icoCerrar}</button></div>
   <div class="wrap"><div class="card">
     <label class="lbl">Nombre (opcional)</label>
     <input style="width:100%" placeholder="Ej: Rutina de verano" value="${esc(f.nombre)}" onchange="formCrear.nombre=this.value">
-    <label class="lbl">¿Qué días entrenás? <span style="color:var(--ac)">(${f.diasSem.length} días)</span></label>
+    <label class="lbl">¿Qué días entrenás? <span style="color:var(--primary)">(${f.diasSem.length} días)</span></label>
     <div class="chips">${DIAS_SEM.map(chipDia).join('')}</div>
     <label class="lbl">Frecuencia por músculo</label>
     <div class="xtabs">
-      ${[1,2,3].map(n=>`<button class="${f.frecuencia===n?'on':''}" onclick="formCrear.frecuencia=${n};rerender()"><span>${n}x semana</span></button>`).join('')}
+      ${[1,2,3].map(n=>`<button class="sl ${f.frecuencia===n?'on':''}" onclick="formCrear.frecuencia=${n};rerender()"><span>${n}x semana</span></button>`).join('')}
     </div>
     <p class="hint">Cuántas veces por semana se entrena cada grupo muscular. Determina el split: 1x → Bro Split, 2x → Upper/Lower o PPL, 3x → Full Body / UL alta frecuencia.</p>
     <label class="lbl">Volumen: series semanales por músculo</label>
     <div class="row">
       <input type="number" min="4" max="25" style="width:70px;text-align:center" value="${f.volMin}" onchange="formCrear.volMin=Math.max(4,+this.value||8);rerender()">
-      <span style="color:var(--tx2)">a</span>
+      <span style="color:var(--on-surface-var)">a</span>
       <input type="number" min="5" max="30" style="width:70px;text-align:center" value="${f.volMax}" onchange="formCrear.volMax=Math.max(formCrear.volMin,+this.value||14);rerender()">
       <span class="hint" style="margin:0">series/semana para los músculos grandes</span>
     </div>
     <p class="hint">Los músculos priorizados reciben el máximo del rango; el resto queda en el medio. Los músculos chicos (gemelos, abs, trapecios) usan proporcionalmente menos.</p>
     <label class="lbl">Tiempo por entrenamiento</label>
     <div class="xtabs">
-      ${[45,60,75,90].map(t=>`<button class="${f.tiempo===t?'on':''}" onclick="formCrear.tiempo=${t};rerender()"><span>${t===90?'90+':t}'</span></button>`).join('')}
+      ${[45,60,75,90].map(t=>`<button class="sl ${f.tiempo===t?'on':''}" onclick="formCrear.tiempo=${t};rerender()"><span>${t===90?'90+':t}'</span></button>`).join('')}
     </div>
     <label class="lbl">Músculos a priorizar (hasta 3)</label>
     <div class="chips">${MUSCULOS.map(chipMus).join('')}</div>
     <label class="lbl">Ejercicios que SÍ o SÍ querés incluir</label>
-    <div class="chips">${f.incluir.map(chipInc).join('')}<button class="chip" onclick="abrirPicker('incluir')">＋ Agregar</button></div>
+    <div class="chips">${f.incluir.map(chipInc).join('')}<button class="chip sl" onclick="abrirPicker('incluir')">＋ Agregar</button></div>
     <label class="lbl">Ejercicios que NO querés</label>
-    <div class="chips">${f.excluir.map(chipExc).join('')}<button class="chip" onclick="abrirPicker('excluir')">＋ Agregar</button></div>
+    <div class="chips">${f.excluir.map(chipExc).join('')}<button class="chip sl" onclick="abrirPicker('excluir')">＋ Agregar</button></div>
     <div style="height:18px"></div>
-    <button class="btn full" onclick="crearAhora()">Generar rutina</button>
+    <button class="btn full sl" onclick="crearAhora()">Generar rutina</button>
   </div></div>`;
 }
 function togDia(d){ const i=formCrear.diasSem.indexOf(d); if(i>=0)formCrear.diasSem.splice(i,1); else formCrear.diasSem.push(d); rerender(); }
@@ -623,28 +817,30 @@ function vRutina(){
       <label class="lbl">Nombre</label>
       <input style="width:100%" value="${esc(r.nombre)}" onchange="rutina('${r.id}').nombre=this.value;guardar();rerender()">
       <label class="lbl">Color</label>
-      <div class="cdots">${COLORES.map(c=>`<button class="cdot ${r.color===c?'on':''}" style="background:${c}" onclick="rutina('${r.id}').color='${c}';guardar();rerender()"></button>`).join('')}</div>
+      <div class="cdots">${COLORES.map(c=>`<button class="cdot sl ${r.color===c?'on':''}" style="background:${c}" onclick="rutina('${r.id}').color='${c}';guardar();rerender()"></button>`).join('')}</div>
       <label class="lbl">Ícono</label>
-      <div class="edots">${EMOJIS.map(e=>`<button class="edot ${r.emoji===e?'on':''}" onclick="rutina('${r.id}').emoji='${e}';guardar();rerender()">${e}</button>`).join('')}</div>
+      <div class="edots">${EMOJIS.map(e=>`<button class="edot sl ${r.emoji===e?'on':''}" onclick="rutina('${r.id}').emoji='${e}';guardar();rerender()">${e}</button>`).join('')}</div>
       <div style="height:16px"></div>
       <div class="row">
-        <button class="btn ghost sm" style="flex:1" onclick="copiarRutina('${r.id}')">Copiar rutina</button>
-        <button class="btn ghost sm" style="flex:1" onclick="abrirPegar()">Pegar rutina</button>
+        <button class="btn ghost sm sl" style="flex:1" onclick="copiarRutina('${r.id}')">Copiar rutina</button>
+        <button class="btn ghost sm sl" style="flex:1" onclick="abrirPegar()">Pegar rutina</button>
       </div>
       <div style="height:8px"></div>
-      <button class="btn ghost sm full" onclick="compartirRutina('${r.id}')">Compartir como texto</button>
+      <button class="btn ghost sm full sl" onclick="compartirRutina('${r.id}')">Compartir como texto</button>
       <div style="height:8px"></div>
-      <button class="btn danger sm full" onclick="borrarRutina('${r.id}')">Eliminar rutina</button>
+      <button class="btn danger sm full sl" onclick="borrarRutina('${r.id}')">Eliminar rutina</button>
     </div>`:'';
   const dias=r.dias.map((d,di)=>vDia(r,d,di)).join('');
   return `<div class="hdr">
     <div style="display:flex;align-items:center;gap:10px;min-width:0">
-      <button class="back" onclick="ir('inicio')">‹</button>
+      <button class="back sl" aria-label="Volver" onclick="ir('inicio')">${icoAtras}</button>
       <div class="dot" style="background:${r.color};width:38px;height:38px;border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0">${r.emoji}</div>
       <div style="min-width:0"><h1 style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${esc(r.nombre)}</h1>
-      <small style="color:var(--tx2)">${r.split} · ${r.dias.length} días</small></div>
+      <small style="color:var(--on-surface-var)">${r.split} · ${r.dias.length} días</small></div>
     </div>
-    <button class="back" style="font-size:1.2rem" onclick="vista.cfg=!vista.cfg;rerender()">⚙️</button>
+    <button class="back sl" aria-label="Ajustes de la rutina" onclick="vista.cfg=!vista.cfg;rerender()">
+      <svg viewBox="0 0 24 24" fill="currentColor" style="width:24px;height:24px"><path d="m19.4 13-.1-1 .1-1 2.1-1.6a.5.5 0 0 0 .1-.6l-2-3.4a.5.5 0 0 0-.6-.2l-2.5 1a7.3 7.3 0 0 0-1.7-1l-.4-2.6a.5.5 0 0 0-.5-.4h-4a.5.5 0 0 0-.5.4l-.4 2.6a7.3 7.3 0 0 0-1.7 1l-2.5-1a.5.5 0 0 0-.6.2l-2 3.4a.5.5 0 0 0 .1.6L4.6 11l-.1 1 .1 1-2.1 1.6a.5.5 0 0 0-.1.6l2 3.4c.1.2.4.3.6.2l2.5-1a7.3 7.3 0 0 0 1.7 1l.4 2.6c0 .2.2.4.5.4h4c.3 0 .5-.2.5-.4l.4-2.6a7.3 7.3 0 0 0 1.7-1l2.5 1c.2.1.5 0 .6-.2l2-3.4a.5.5 0 0 0-.1-.6zM12 15.5a3.5 3.5 0 1 1 0-7 3.5 3.5 0 0 1 0 7"/></svg>
+    </button>
   </div>
   <div class="wrap">
     ${bannerSesion()}
@@ -662,30 +858,30 @@ function vDia(r,d,di){
     const tope=repsTope(e.reps);
     const subir=u&&u.r!=null&&tope&&u.r>=tope;
     return `<div class="trow">
-      <div class="nom">${esc(ex.nombre)}<small>${ex.musculo}${u?' · últ. '+fFecha(u.f):''}${pr!=null?' · PR '+pr:''}${subir?' <span style="color:var(--ok);font-weight:700">↑ subí</span>':''}</small>${e.nota?`<small style="color:var(--ac);font-style:italic">${esc(e.nota)}</small>`:''}</div>
+      <div class="nom">${esc(ex.nombre)}<small>${ex.musculo}${u?' · últ. '+fFecha(u.f):''}${pr!=null?' · PR '+pr:''}${subir?' <span style="color:var(--tertiary);font-weight:700">↑ subí</span>':''}</small>${e.nota?`<small style="color:var(--primary);font-style:italic">${esc(e.nota)}</small>`:''}</div>
       <input type="number" value="${e.series}" onchange="setEj(${di},${ei},'series',+this.value||1)">
       <input value="${esc(e.reps)}" onchange="setEj(${di},${ei},'reps',this.value)">
       <input type="number" step="0.5" class="logv" placeholder="kg" value="${u&&u.p!=null?u.p:''}" onchange="logEj(${di},${ei},'p',this.value)">
       <input type="number" class="logv" placeholder="—" value="${u&&u.r!=null?u.r:''}" onchange="logEj(${di},${ei},'r',this.value)">
-      <button class="menu-btn" onclick="event.stopPropagation();togMenu('${di}-${ei}')">···</button>
+      <button class="menu-btn sl" onclick="event.stopPropagation();togMenu('${di}-${ei}')">···</button>
       ${menuAbierto===di+'-'+ei?`<div class="menu">
-        <button onclick="moverEj(${di},${ei},-1)">Subir</button>
-        <button onclick="moverEj(${di},${ei},1)">Bajar</button>
-        <button onclick="abrirPicker('reemplazar',${di},${ei})">Reemplazar</button>
-        <button onclick="abrirNota(${di},${ei})">Nota</button>
-        <button onclick="verGrafico('${e.exId}')">Ver progreso</button>
-        <button style="color:var(--bad)" onclick="quitarEj(${di},${ei})">Eliminar</button>
+        <button class="sl" onclick="moverEj(${di},${ei},-1)">Subir</button>
+        <button class="sl" onclick="moverEj(${di},${ei},1)">Bajar</button>
+        <button class="sl" onclick="abrirPicker('reemplazar',${di},${ei})">Reemplazar</button>
+        <button class="sl" onclick="abrirNota(${di},${ei})">Nota</button>
+        <button class="sl" onclick="verGrafico('${e.exId}')">Ver progreso</button>
+        <button class="sl" style="color:var(--error)" onclick="quitarEj(${di},${ei})">Eliminar</button>
       </div>`:''}
     </div>`;
   }).join('');
   return `<div class="card dia" style="padding:0">
     <div class="dia-h">
       <div><b>${d.dia}</b> <small>· ${esc(d.titulo)} · ${d.ejercicios.reduce((s,e)=>s+e.series,0)} series</small><span class="dbar" style="background:${r.color}"></span></div>
-      ${d.ejercicios.length?`<button class="btn sm" onclick="empezarSesion(${di})">Entrenar</button>`:''}
+      ${d.ejercicios.length?`<button class="btn sm sl" onclick="empezarSesion(${di})">Entrenar</button>`:''}
     </div>
     <div class="thead"><div>Ejercicio</div><div>Ser</div><div>Reps</div><div>Peso</div><div>Hechas</div><div></div></div>
     ${filas||'<div class="empty" style="padding:16px">Sin ejercicios</div>'}
-    <button class="addex" onclick="abrirPicker('agregar',${di})">Agregar ejercicio</button>
+    <button class="addex sl" onclick="abrirPicker('agregar',${di})">Agregar ejercicio</button>
   </div>`;
 }
 function togMenu(k){
@@ -758,13 +954,13 @@ function vChart(r){
     const Y=v=>H-my-(v-min)*(H-my-18)/(max-min);
     const line=pts.map((x,i)=>`${X(i).toFixed(1)},${Y(x.p).toFixed(1)}`).join(' ');
     const dots=pts.map((x,i)=>`<circle cx="${X(i).toFixed(1)}" cy="${Y(x.p).toFixed(1)}" r="4" fill="${r.color}"/>
-      <text x="${X(i).toFixed(1)}" y="${(Y(x.p)-9).toFixed(1)}" text-anchor="middle" font-size="10" fill="var(--tx2)">${x.p}</text>`).join('');
-    const labs=pts.map((x,i)=>(i===0||i===pts.length-1||i%Math.ceil(pts.length/5)===0)?`<text x="${X(i).toFixed(1)}" y="${H-6}" text-anchor="middle" font-size="9" fill="var(--tx3)">${fFecha(x.f)}</text>`:'').join('');
+      <text x="${X(i).toFixed(1)}" y="${(Y(x.p)-9).toFixed(1)}" text-anchor="middle" font-size="10" fill="var(--on-surface-var)">${x.p}</text>`).join('');
+    const labs=pts.map((x,i)=>(i===0||i===pts.length-1||i%Math.ceil(pts.length/5)===0)?`<text x="${X(i).toFixed(1)}" y="${H-6}" text-anchor="middle" font-size="9" fill="var(--on-surface-var)">${fFecha(x.f)}</text>`:'').join('');
     svg=`<div class="chart-wrap"><svg width="${W}" height="${H}" viewBox="0 0 ${W} ${H}">
-      <text x="4" y="${Y(max)+4}" font-size="9" fill="var(--tx3)">${max}</text>
-      <text x="4" y="${Y(min)+4}" font-size="9" fill="var(--tx3)">${min}</text>
-      <line x1="${mx-6}" y1="${Y(max)}" x2="${W-10}" y2="${Y(max)}" stroke="var(--border)" stroke-dasharray="3 4"/>
-      <line x1="${mx-6}" y1="${Y(min)}" x2="${W-10}" y2="${Y(min)}" stroke="var(--border)" stroke-dasharray="3 4"/>
+      <text x="4" y="${Y(max)+4}" font-size="9" fill="var(--on-surface-var)">${max}</text>
+      <text x="4" y="${Y(min)+4}" font-size="9" fill="var(--on-surface-var)">${min}</text>
+      <line x1="${mx-6}" y1="${Y(max)}" x2="${W-10}" y2="${Y(max)}" stroke="var(--outline-var)" stroke-dasharray="3 4"/>
+      <line x1="${mx-6}" y1="${Y(min)}" x2="${W-10}" y2="${Y(min)}" stroke="var(--outline-var)" stroke-dasharray="3 4"/>
       <polyline points="${line}" fill="none" stroke="${r.color}" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round"/>
       ${dots}${labs}
     </svg></div>`;
@@ -773,7 +969,7 @@ function vChart(r){
   return `<div class="card">
     <div class="row" style="justify-content:space-between">
       <h3>Progreso</h3>
-      ${dif!=null?`<span style="color:${dif>=0?'var(--ok)':'var(--bad)'};font-weight:700;font-size:.9rem">${dif>=0?'+':''}${Math.round(dif*10)/10} kg</span>`:''}
+      ${dif!=null?`<span style="color:${dif>=0?'var(--tertiary)':'var(--error)'};font-weight:700;font-size:.9rem">${dif>=0?'+':''}${Math.round(dif*10)/10} kg</span>`:''}
     </div>
     <div style="height:8px"></div>
     <select style="width:100%" onchange="vista.chartEx=this.value;rerender()">
@@ -803,11 +999,11 @@ function ordenarMedidas(){ S.medidas.sort((a,b)=>a.f<b.f?-1:(a.f>b.f?1:0)); }
 function ultMedida(){ return S.medidas.length?S.medidas[S.medidas.length-1]:null; }
 function imcDe(p,a){ if(!p||!a) return null; const m=a/100; return Math.round(p/(m*m)*10)/10; }
 function catIMC(v){
-  if(v==null) return {t:'—',c:'var(--tx2)'};
+  if(v==null) return {t:'—',c:'var(--on-surface-var)'};
   if(v<18.5) return {t:'Bajo peso',c:'#4da3ff'};
-  if(v<25)   return {t:'Peso normal',c:'var(--ok)'};
+  if(v<25)   return {t:'Peso normal',c:'var(--tertiary)'};
   if(v<30)   return {t:'Sobrepeso',c:'var(--warn)'};
-  return {t:'Obesidad',c:'var(--bad)'};
+  return {t:'Obesidad',c:'var(--error)'};
 }
 function posIMC(v){ return v==null?0:Math.max(0,Math.min(100,(v-15)/25*100)); }
 function actualizarIMC(){
@@ -831,10 +1027,10 @@ function vCuerpo(){
     const mi=imcDe(m.peso,m.altura);
     return `<div class="mrow">
       <span class="d">${fFecha(m.f)}</span>
-      <span class="c"><b>${m.peso}</b> <small style="color:var(--tx3)">kg</small></span>
+      <span class="c"><b>${m.peso}</b> <small style="color:var(--on-surface-var)">kg</small></span>
       <span class="c" style="color:${catIMC(mi).c};font-weight:700">${mi!=null?mi.toFixed(1):'—'}</span>
-      <span class="c ${d==null?'':(d>0?'sube':'baja')}">${d==null?'<span style="color:var(--tx3)">—</span>':(d>0?'+':'')+d+' kg'}</span>
-      <button class="menu-btn" aria-label="Borrar registro" onclick="borrarMedida('${m.f}')">🗑</button>
+      <span class="c ${d==null?'':(d>0?'sube':'baja')}">${d==null?'<span style="color:var(--on-surface-var)">—</span>':(d>0?'+':'')+d+' kg'}</span>
+      <button class="menu-btn sl" aria-label="Borrar registro" onclick="borrarMedida('${m.f}')">🗑</button>
     </div>`;
   }).join('');
 
@@ -853,7 +1049,7 @@ function vCuerpo(){
       <label class="lbl">Fecha</label>
       <input type="date" style="width:100%" value="${medForm.f}" max="${hoy()}" onchange="medForm.f=this.value||hoy()">
       <div style="height:14px"></div>
-      <button class="btn full" onclick="guardarMedida()">Guardar registro</button>
+      <button class="btn full sl" onclick="guardarMedida()">Guardar registro</button>
       <p class="hint">Cada registro se guarda con su fecha: podés cargar uno nuevo cuando quieras sin perder los anteriores.</p>
     </div>
 
@@ -863,7 +1059,7 @@ function vCuerpo(){
         <span id="imc-t" style="color:${c.c};font-weight:700;font-size:.85rem">${c.t}</span>
       </div>
       <div style="height:10px"></div>
-      <div class="imc"><b id="imc-v">${v!=null?v.toFixed(1):'—'}</b><span style="color:var(--tx2);font-size:.85rem">kg/m²</span></div>
+      <div class="imc"><b id="imc-v">${v!=null?v.toFixed(1):'—'}</b><span style="color:var(--on-surface-var);font-size:.85rem">kg/m²</span></div>
       <div class="bar"><i id="imc-m" style="left:${posIMC(v)}%"></i></div>
       <div class="barl"><span>15</span><span>18,5</span><span>25</span><span>30</span><span>40</span></div>
       <p class="hint">Es solo un dato de referencia: no distingue músculo de grasa, así que en alguien que entrena suele dar más alto de lo que corresponde.</p>
@@ -872,7 +1068,7 @@ function vCuerpo(){
     ${S.medidas.length?`<div class="card">
       <div class="row" style="justify-content:space-between">
         <h3>Evolución del peso</h3>
-        ${total!=null?`<span style="color:${total<=0?'var(--ok)':'var(--warn)'};font-weight:700;font-size:.9rem">${total>0?'+':''}${total} kg</span>`:''}
+        ${total!=null?`<span style="color:${total<=0?'var(--tertiary)':'var(--warn)'};font-weight:700;font-size:.9rem">${total>0?'+':''}${total} kg</span>`:''}
       </div>
       <div style="height:10px"></div>
       ${chartMedidas()}
@@ -892,15 +1088,15 @@ function chartMedidas(){
   const X=i=>mx+i*(W-mx-14)/(pts.length-1);
   const Y=v=>H-my-(v-min)*(H-my-18)/(max-min);
   const line=pts.map((x,i)=>`${X(i).toFixed(1)},${Y(x.peso).toFixed(1)}`).join(' ');
-  const dots=pts.map((x,i)=>`<circle cx="${X(i).toFixed(1)}" cy="${Y(x.peso).toFixed(1)}" r="4" fill="var(--ac)"/>
-    <text x="${X(i).toFixed(1)}" y="${(Y(x.peso)-9).toFixed(1)}" text-anchor="middle" font-size="10" fill="var(--tx2)">${x.peso}</text>`).join('');
-  const labs=pts.map((x,i)=>(i===0||i===pts.length-1||i%Math.ceil(pts.length/5)===0)?`<text x="${X(i).toFixed(1)}" y="${H-6}" text-anchor="middle" font-size="9" fill="var(--tx3)">${fFecha(x.f)}</text>`:'').join('');
+  const dots=pts.map((x,i)=>`<circle cx="${X(i).toFixed(1)}" cy="${Y(x.peso).toFixed(1)}" r="4" fill="var(--primary)"/>
+    <text x="${X(i).toFixed(1)}" y="${(Y(x.peso)-9).toFixed(1)}" text-anchor="middle" font-size="10" fill="var(--on-surface-var)">${x.peso}</text>`).join('');
+  const labs=pts.map((x,i)=>(i===0||i===pts.length-1||i%Math.ceil(pts.length/5)===0)?`<text x="${X(i).toFixed(1)}" y="${H-6}" text-anchor="middle" font-size="9" fill="var(--on-surface-var)">${fFecha(x.f)}</text>`:'').join('');
   return `<div class="chart-wrap"><svg width="${W}" height="${H}" viewBox="0 0 ${W} ${H}">
-    <text x="4" y="${Y(max)+4}" font-size="9" fill="var(--tx3)">${max}</text>
-    <text x="4" y="${Y(min)+4}" font-size="9" fill="var(--tx3)">${min}</text>
-    <line x1="${mx-6}" y1="${Y(max)}" x2="${W-10}" y2="${Y(max)}" stroke="var(--border)" stroke-dasharray="3 4"/>
-    <line x1="${mx-6}" y1="${Y(min)}" x2="${W-10}" y2="${Y(min)}" stroke="var(--border)" stroke-dasharray="3 4"/>
-    <polyline points="${line}" fill="none" stroke="var(--ac)" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round"/>
+    <text x="4" y="${Y(max)+4}" font-size="9" fill="var(--on-surface-var)">${max}</text>
+    <text x="4" y="${Y(min)+4}" font-size="9" fill="var(--on-surface-var)">${min}</text>
+    <line x1="${mx-6}" y1="${Y(max)}" x2="${W-10}" y2="${Y(max)}" stroke="var(--outline-var)" stroke-dasharray="3 4"/>
+    <line x1="${mx-6}" y1="${Y(min)}" x2="${W-10}" y2="${Y(min)}" stroke="var(--outline-var)" stroke-dasharray="3 4"/>
+    <polyline points="${line}" fill="none" stroke="var(--primary)" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round"/>
     ${dots}${labs}
   </svg></div>`;
 }
@@ -930,7 +1126,7 @@ function vEjercicios(){
       <summary>${m}<span class="n">${lista.length} ejercicios</span></summary>
       <div class="body">${lista.map(e=>`
         <div class="exrow"><span>${esc(e.nombre)}${e.custom?' <small>(propio)</small>':''}</span>
-        ${e.custom?`<button style="color:var(--bad)" onclick="borrarEx('${e.id}')">🗑</button>`:`<small>${e.reps}</small>`}</div>`).join('')}
+        ${e.custom?`<button style="color:var(--error)" onclick="borrarEx('${e.id}')">🗑</button>`:`<small>${e.reps}</small>`}</div>`).join('')}
       </div>
     </details>`;
   }).join('');
@@ -943,7 +1139,7 @@ function vEjercicios(){
         <select id="nx-mus" onchange="exForm.musculo=this.value">${MUSCULOS.map(m=>`<option ${exForm.musculo===m?'selected':''}>${m}</option>`).join('')}</select>
       </div>
       <div style="height:10px"></div>
-      <button class="btn sm" onclick="agregarEx()">＋ Agregar</button>
+      <button class="btn sm sl" onclick="agregarEx()">＋ Agregar</button>
     </div>
     ${grupos}
   </div>`;
@@ -964,12 +1160,13 @@ function borrarEx(id){
 let confirmCb=null;
 function confirmar(msg,accion,cb,color){
   confirmCb=cb;
+  const esOk=color==='var(--tertiary)';
   document.getElementById('modal').innerHTML=`<div class="overlay" style="align-items:center" onclick="if(event.target===this)cerrarConfirm()">
-    <div class="modal" style="border-radius:18px;margin:0 20px;max-width:400px">
-      <p style="padding:4px 2px 18px;line-height:1.45">${msg}</p>
-      <div class="row">
-        <button class="btn ghost sm" style="flex:1" onclick="cerrarConfirm()">Cancelar</button>
-        <button class="btn sm" style="flex:1;background:${color||'var(--bad)'}" onclick="okConfirm()">${accion}</button>
+    <div class="modal" style="border-radius:var(--r-xl);margin:0 24px;max-width:400px;padding:24px">
+      <p style="padding:0 0 24px;line-height:1.5;font-size:.875rem;letter-spacing:.016em;color:var(--on-surface-var)">${msg}</p>
+      <div class="row" style="justify-content:flex-end;gap:8px">
+        <button class="btn ghost sm sl" onclick="cerrarConfirm()">Cancelar</button>
+        <button class="btn sm sl" style="background:${color||'var(--error)'};color:${esOk?'var(--on-tertiary)':'var(--on-error)'}" onclick="okConfirm()">${accion}</button>
       </div>
     </div>
   </div>`;
@@ -990,7 +1187,7 @@ function renderPicker(){
     <div class="modal">
       <div class="row" style="justify-content:space-between">
         <h2>${titulos[picker.modo]}</h2>
-        <button class="back" onclick="cerrarPicker()">✕</button>
+        <button class="back sl" aria-label="Cerrar" onclick="cerrarPicker()">${icoCerrar}</button>
       </div>
       <div style="height:10px"></div>
       <input id="pk-q" class="spill" placeholder="Buscar ejercicio" oninput="picker.q=this.value;pintarLista()">
@@ -1007,7 +1204,7 @@ function pintarLista(){
     const lista=S.ejercicios.filter(e=>e.musculo===m&&(!q||norm(e.nombre).includes(norm(q))||norm(m).includes(norm(q))));
     if(!lista.length) return '';
     return `<div class="mgrp">${m}</div>`+lista.map(e=>
-      `<button class="mitem" onclick="elegirEx('${e.id}')">${esc(e.nombre)}<small>${e.reps}</small></button>`).join('');
+      `<button class="mitem sl" onclick="elegirEx('${e.id}')">${esc(e.nombre)}<small>${e.reps}</small></button>`).join('');
   }).join('');
   document.getElementById('pk-list').innerHTML=html||'<div class="empty">Sin resultados</div>';
 }
@@ -1043,10 +1240,10 @@ window.addEventListener('appinstalled',()=>{
 function bannerInstalar(){
   if(yaInstalada()) return '';
   if(promptInstalar){
-    return `<div class="card rcard" style="border-color:var(--ac)">
-      <div class="dot" style="background:var(--ac)">📲</div>
+    return `<div class="card rcard" style="border-color:var(--primary)">
+      <div class="dot" style="background:var(--primary)">📲</div>
       <div class="meta"><small>Para usarla a pantalla completa y sin conexión</small><h3>Instalar como app</h3></div>
-      <button class="btn sm" onclick="instalarApp()">Instalar</button>
+      <button class="btn sm sl" onclick="instalarApp()">Instalar</button>
     </div>`;
   }
   if(location.protocol!=='https:') return '';
@@ -1060,10 +1257,10 @@ function bannerRespaldo(){
   const ref=S.ultimoRespaldo||S.desde;
   const dias=Math.round((new Date(hoy()+'T12:00:00')-new Date(ref+'T12:00:00'))/86400000);
   if(dias<14) return '';
-  return `<div class="card rcard" style="border-color:var(--ac)" onclick="exportar()">
-    <div class="dot" style="background:var(--ac)">💾</div>
+  return `<div class="card rcard" style="border-color:var(--primary)" onclick="exportar()">
+    <div class="dot" style="background:var(--primary)">💾</div>
     <div class="meta"><small>El navegador puede borrar los datos guardados si pasa tiempo sin usar la app</small><h3>Hacer respaldo ahora</h3></div>
-    <span style="color:var(--ac);font-weight:700">Exportar</span>
+    <span style="color:var(--primary);font-weight:700">Exportar</span>
   </div>`;
 }
 function instalarApp(){
@@ -1083,10 +1280,10 @@ function bannerSesion(){
   const s=S.sesionActiva; if(!s) return '';
   const r=rutina(s.rid); if(!r){ S.sesionActiva=null; return ''; }
   const d=r.dias[s.di]; if(!d){ S.sesionActiva=null; return ''; }
-  return `<div class="card rcard" style="border-color:var(--ac)" onclick="vista={p:'sesion'};render()">
-    <div class="dot" style="background:var(--ac)">⏱</div>
+  return `<div class="card rcard" style="border-color:var(--primary)" onclick="vista={p:'sesion'};render()">
+    <div class="dot" style="background:var(--primary)">⏱</div>
     <div class="meta"><small>Entrenamiento en curso</small><h3>${d.dia} · ${esc(d.titulo)}</h3></div>
-    <span style="color:var(--ac);font-weight:700">Continuar</span>
+    <span style="color:var(--primary);font-weight:700">Continuar</span>
   </div>`;
 }
 function empezarSesion(di){
@@ -1110,19 +1307,19 @@ function vSesion(){
     const tope=repsTope(se.reps);
     const subir=u&&u.r!=null&&tope&&u.r>=tope;
     const filas=se.series.map((st,j)=>`
-      <div class="srow">
-        <span style="color:var(--tx3);font-size:.8rem">Serie ${j+1}</span>
+      <div class="srow ${st.ok?'done':''}">
+        <span style="color:var(--on-surface-var);font-size:.8rem">Serie ${j+1}</span>
         <input type="number" step="0.5" placeholder="kg" value="${st.p!=null?st.p:''}" onchange="setSerie(${i},${j},'p',this.value)">
         <input type="number" placeholder="reps" value="${st.r!=null?st.r:''}" onchange="setSerie(${i},${j},'r',this.value)">
-        <button class="chk ${st.ok?'ok':''}" onclick="checkSerie(${i},${j})">✓</button>
+        <button class="chk sl ${st.ok?'ok':''}" onclick="checkSerie(${i},${j})">✓</button>
       </div>`).join('');
     return `<div class="card">
       <div class="row" style="justify-content:space-between;align-items:flex-start">
         <div style="min-width:0"><b>${esc(ex.nombre)}</b>
-          <small style="display:block;color:var(--tx2)">${ex.musculo} · objetivo ${se.series.length}×${esc(se.reps)}${u?' · últ. '+(u.p!=null?u.p+' kg':'')+(u.r!=null?' × '+u.r:''):''}</small>
-          ${se.nota?`<small style="display:block;color:var(--ac);font-style:italic">${esc(se.nota)}</small>`:''}
+          <small style="display:block;color:var(--on-surface-var)">${ex.musculo} · objetivo ${se.series.length}×${esc(se.reps)}${u?' · últ. '+(u.p!=null?u.p+' kg':'')+(u.r!=null?' × '+u.r:''):''}</small>
+          ${se.nota?`<small style="display:block;color:var(--primary);font-style:italic">${esc(se.nota)}</small>`:''}
         </div>
-        ${subir?'<span style="color:var(--ok);font-weight:700;font-size:.78rem;white-space:nowrap">↑ subí peso</span>':''}
+        ${subir?'<span style="color:var(--tertiary);font-weight:700;font-size:.78rem;white-space:nowrap">↑ subí peso</span>':''}
       </div>
       <div style="height:6px"></div>
       ${filas}
@@ -1131,25 +1328,25 @@ function vSesion(){
   const hechoN=s.ej.reduce((a,se)=>a+se.series.filter(x=>x.ok).length,0);
   const totN=s.ej.reduce((a,se)=>a+se.series.length,0);
   return `<div class="hdr">
-    <div><h1>${d.dia} <small style="color:var(--tx2);font-weight:400;font-size:.95rem">· ${esc(d.titulo)}</small></h1>
-    <small style="color:var(--tx2)">${hechoN}/${totN} series completadas</small></div>
-    <button class="back" onclick="salirSesion()">✕</button>
+    <div><h1>${d.dia} <small style="color:var(--on-surface-var);font-weight:400;font-size:.95rem">· ${esc(d.titulo)}</small></h1>
+    <small style="color:var(--on-surface-var)">${hechoN}/${totN} series completadas</small></div>
+    <button class="back sl" aria-label="Salir" onclick="salirSesion()">${icoCerrar}</button>
   </div>
   <div class="wrap" style="padding-bottom:70px">
     <div class="card">
       <div class="row" style="justify-content:space-between">
-        <span style="color:var(--tx2);font-size:.85rem;font-weight:600">Descanso entre series</span>
+        <span style="color:var(--on-surface-var);font-size:.85rem;font-weight:600">Descanso entre series</span>
         <div class="row" style="gap:8px">
           <select onchange="S.descanso=+this.value;guardar();rerender()">${[45,60,90,120,150,180].map(x=>`<option value="${x}" ${(S.descanso||90)===x?'selected':''}>${x}s</option>`).join('')}</select>
-          <button class="btn sm" onclick="iniciarTimer(S.descanso||90)">⏱ Iniciar</button>
+          <button class="btn sm sl" onclick="iniciarTimer(S.descanso||90)">⏱ Iniciar</button>
         </div>
       </div>
       ${avisoNotif()}
     </div>
     ${cards}
-    <button class="btn full" style="background:var(--ok)" onclick="terminarSesion()">Terminar entrenamiento</button>
+    <button class="btn full sl" style="background:var(--tertiary)" onclick="terminarSesion()">Terminar entrenamiento</button>
     <div style="height:10px"></div>
-    <button class="btn danger sm full" onclick="confirmar('¿Descartar este entrenamiento? No se guarda nada.','Descartar',descartarSesion)">Descartar</button>
+    <button class="btn danger sm full sl" onclick="confirmar('¿Descartar este entrenamiento? No se guarda nada.','Descartar',descartarSesion)">Descartar</button>
   </div>`;
 }
 function setSerie(i,j,c,v){ S.sesionActiva.ej[i].series[j][c]=v===''?null:+v; guardar(); }
@@ -1163,34 +1360,45 @@ function fmtT(sg){ sg=Math.max(0,sg); return Math.floor(sg/60)+':'+String(sg%60)
 function timerMs(){ return timerPausa!=null?timerPausa:(timerFin!=null?timerFin-Date.now():0); }
 function timerActivo(){ return timerFin!=null||timerPausa!=null||timerAviso; }
 
+/* El anillo es un círculo SVG al que le animamos stroke-dashoffset: es el
+   "circular progress indicator determinado" de M3. RADIO/CIRC se comparten con tickTimer. */
+const T_RADIO=76, T_CIRC=2*Math.PI*T_RADIO;
+function anillo(pct,contenido){
+  return `<div class="tring">
+    <svg viewBox="0 0 180 180">
+      <circle class="bg" cx="90" cy="90" r="${T_RADIO}"/>
+      <circle class="fg" id="tring-fg" cx="90" cy="90" r="${T_RADIO}"
+        stroke-dasharray="${T_CIRC.toFixed(1)}" stroke-dashoffset="${(T_CIRC*(1-pct)).toFixed(1)}"/>
+    </svg>
+    ${contenido}
+  </div>`;
+}
 function timerHtml(){
   const ct=vista.p!=='sesion'?' contabs':'';
   if(timerAviso){
     return `<div class="tpanel fin${ct}">
-      <div class="tprog"><i style="width:100%"></i></div>
-      <div class="thead2" style="color:var(--ok)"><span>✔ Descanso terminado</span><span></span></div>
-      <div class="tnum">0:00</div>
+      <div class="thead2" style="color:var(--tertiary)"><span>✔ Descanso terminado</span><span></span></div>
+      ${anillo(1,'<div class="tnum">0:00</div>')}
       <div class="tsub">¡A darle a la próxima serie! 💪</div>
       <div class="trow2">
-        <button class="tbtn" onclick="iniciarTimer(timerUlt||S.descanso||90)">↻ Otra vez</button>
-        <button class="tbtn pri" onclick="cerrarAviso()">Listo</button>
+        <button class="tbtn sl" onclick="iniciarTimer(timerUlt||S.descanso||90)">↻ Otra vez</button>
+        <button class="tbtn pri sl" onclick="cerrarAviso()">Listo</button>
       </div>
     </div>`;
   }
   if(timerFin==null&&timerPausa==null) return '';
   const ms=Math.max(0,timerMs());
   const sg=Math.ceil(ms/1000);
-  const pct=timerTotal?Math.max(0,Math.min(100,ms/(timerTotal*1000)*100)):0;
+  const pct=timerTotal?Math.max(0,Math.min(1,ms/(timerTotal*1000))):0;
   return `<div class="tpanel${ct}${sg<=10&&timerPausa==null?' warn':''}" id="tpanel">
-    <div class="tprog"><i id="tprog" style="width:${pct.toFixed(1)}%"></i></div>
     <div class="thead2"><span>⏱ Descanso</span><span>de ${fmtT(timerTotal)}</span></div>
-    <div class="tnum" id="resto">${fmtT(sg)}</div>
+    ${anillo(pct,`<div class="tnum" id="resto">${fmtT(sg)}</div>`)}
     <div class="tsub">${timerPausa!=null?'En pausa':'Respirá y preparate para la próxima serie'}</div>
     <div class="trow2">
-      <button class="tbtn" onclick="ajustarTimer(-15)">−15s</button>
-      <button class="tbtn" onclick="ajustarTimer(30)">+30s</button>
-      <button class="tbtn" onclick="togglePausa()">${timerPausa!=null?'▶ Seguir':'❚❚ Pausa'}</button>
-      <button class="tbtn pri" onclick="pararTimer()">Saltar</button>
+      <button class="tbtn sl" onclick="ajustarTimer(-15)">−15s</button>
+      <button class="tbtn sl" onclick="ajustarTimer(30)">+30s</button>
+      <button class="tbtn sl" onclick="togglePausa()">${timerPausa!=null?'▶ Seguir':'❚❚ Pausa'}</button>
+      <button class="tbtn pri sl" onclick="pararTimer()">Saltar</button>
     </div>
   </div>`;
 }
@@ -1237,8 +1445,11 @@ function tickTimer(){
   if(ms<=0){ finTimer(); return; }
   const sg=Math.ceil(ms/1000);
   const el=document.getElementById('resto'); if(el) el.textContent=fmtT(sg);
-  const pr=document.getElementById('tprog');
-  if(pr&&timerTotal) pr.style.width=Math.max(0,Math.min(100,ms/(timerTotal*1000)*100)).toFixed(1)+'%';
+  const fg=document.getElementById('tring-fg');
+  if(fg&&timerTotal){
+    const pct=Math.max(0,Math.min(1,ms/(timerTotal*1000)));
+    fg.setAttribute('stroke-dashoffset',(T_CIRC*(1-pct)).toFixed(1));
+  }
   const pa=document.getElementById('tpanel');
   if(pa) pa.classList.toggle('warn',sg<=10);
 }
@@ -1311,7 +1522,7 @@ function avisoNotif(){
   if(!('Notification' in window)) return '<p class="hint">Este navegador no puede mandar notificaciones: al llegar a 0 la app avisa con sonido, vibración y un aviso en pantalla.</p>';
   if(Notification.permission==='granted') return '<p class="hint">🔔 Al llegar a 0 vas a recibir una notificación aunque tengas la app en segundo plano.</p>';
   if(Notification.permission==='denied') return '<p class="hint">🔕 Bloqueaste las notificaciones. El aviso va a ser con sonido, vibración y un flash en pantalla (necesitás tener la app abierta). Podés habilitarlas desde los ajustes del sitio en Chrome.</p>';
-  return `<p class="hint">🔔 Activá las notificaciones para que te avise aunque salgas de la app. <button style="color:var(--ac);font-weight:700;text-decoration:underline" onclick="pedirPermisoNotif()">Activar</button></p>`;
+  return `<p class="hint">🔔 Activá las notificaciones para que te avise aunque salgas de la app. <button style="color:var(--primary);font-weight:700;text-decoration:underline" onclick="pedirPermisoNotif()">Activar</button></p>`;
 }
 document.addEventListener('visibilitychange',()=>{
   if(document.visibilityState!=='visible'||timerFin==null) return;
@@ -1324,7 +1535,7 @@ function salirSesion(){
 function terminarSesion(){
   const n=S.sesionActiva.ej.reduce((a,se)=>a+se.series.filter(x=>x.ok).length,0);
   if(!n){ confirmar('No marcaste ninguna serie. ¿Descartar el entrenamiento?','Descartar',descartarSesion); return; }
-  confirmar('¿Terminar y guardar el entrenamiento?','Guardar',finalizarSesion,'var(--ok)');
+  confirmar('¿Terminar y guardar el entrenamiento?','Guardar',finalizarSesion,'var(--tertiary)');
 }
 function finalizarSesion(){
   const s=S.sesionActiva, r=rutina(s.rid), d=r.dias[s.di];
@@ -1379,7 +1590,7 @@ function vCalendario(){
   return `<div class="card">
     <div class="row" style="justify-content:space-between">
       <h3>Actividad</h3>
-      ${racha>0?`<span style="color:var(--ac);font-weight:700;font-size:.9rem">🔥 ${racha} ${racha===1?'semana':'semanas seguidas'}</span>`:''}
+      ${racha>0?`<span style="color:var(--primary);font-weight:700;font-size:.9rem">🔥 ${racha} ${racha===1?'semana':'semanas seguidas'}</span>`:''}
     </div>
     <div style="height:10px"></div>
     <div class="cal">${cols.join('')}</div>
@@ -1400,8 +1611,8 @@ function abrirNota(di,ei){
       <textarea id="nota-txt" rows="3" style="width:100%;resize:vertical" placeholder="Ej: agarre cerrado, asiento en 4...">${esc(e.nota||'')}</textarea>
       <div style="height:14px"></div>
       <div class="row">
-        <button class="btn ghost sm" style="flex:1" onclick="cerrarNota()">Cancelar</button>
-        <button class="btn sm" style="flex:1" onclick="guardarNota()">Guardar</button>
+        <button class="btn ghost sm sl" style="flex:1" onclick="cerrarNota()">Cancelar</button>
+        <button class="btn sm sl" style="flex:1" onclick="guardarNota()">Guardar</button>
       </div>
     </div>
   </div>`;
@@ -1512,27 +1723,27 @@ function renderPegar(){
     const nSer=pl.dias.reduce((a,d)=>a+d.ejercicios.reduce((b,e)=>b+(+e.series||0),0),0);
     const conLog=pl.dias.some(d=>d.ejercicios.some(e=>(e.log||[]).length));
     return `<div class="card" style="margin-bottom:14px">
-        <small style="color:var(--tx2)">En el portapapeles</small>
+        <small style="color:var(--on-surface-var)">En el portapapeles</small>
         <h3 style="margin-top:2px">${pl.emoji||''} ${esc(pl.nombre||'Rutina')}</h3>
         <p class="hint">${pl.dias.length} días · ${nEj} ejercicios · ${nSer} series${pl.copiada?' · copiada '+fFecha(pl.copiada):''}</p>
       </div>
       ${conLog?`<div class="chips" style="margin-bottom:14px">
-        <button class="chip ${pegarCtx.pesos?'on':''}" onclick="pegarCtx.pesos=true;renderPegar()">Con los pesos</button>
-        <button class="chip ${pegarCtx.pesos?'':'on'}" onclick="pegarCtx.pesos=false;renderPegar()">Sin pesos (de cero)</button>
+        <button class="chip sl ${pegarCtx.pesos?'on':''}" onclick="pegarCtx.pesos=true;renderPegar()">Con los pesos</button>
+        <button class="chip sl ${pegarCtx.pesos?'':'on'}" onclick="pegarCtx.pesos=false;renderPegar()">Sin pesos (de cero)</button>
       </div>`:''}
-      <button class="opt" onclick="pegarComoNueva()">＋ Pegar como rutina nueva<small>Se agrega a la lista sin tocar las que ya tenés</small></button>
+      <button class="opt sl" onclick="pegarComoNueva()">＋ Pegar como rutina nueva<small>Se agrega a la lista sin tocar las que ya tenés</small></button>
       ${S.rutinas.length?`<div class="secc">O sobrescribir una existente</div>`+
-        S.rutinas.map(r=>`<button class="opt" onclick="pegarSobre('${r.id}')">${r.emoji} ${esc(r.nombre)}<small>Reemplaza sus días y ejercicios · mantiene el nombre y el historial de entrenamientos</small></button>`).join(''):''}`;
+        S.rutinas.map(r=>`<button class="opt sl" onclick="pegarSobre('${r.id}')">${r.emoji} ${esc(r.nombre)}<small>Reemplaza sus días y ejercicios · mantiene el nombre y el historial de entrenamientos</small></button>`).join(''):''}`;
   })():`<div class="empty" style="padding:26px 10px">No hay ninguna rutina copiada.<br>Tocá el botón de copiar (⧉) de una rutina para copiarla.</div>`;
   document.getElementById('modal').innerHTML=`<div class="overlay" onclick="if(event.target===this)cerrarModal()">
     <div class="modal">
       <div class="row" style="justify-content:space-between">
-        <h2>Pegar rutina</h2><button class="back" onclick="cerrarModal()">✕</button>
+        <h2>Pegar rutina</h2><button class="back sl" aria-label="Cerrar" onclick="cerrarModal()">${icoCerrar}</button>
       </div>
       <div class="list" style="margin-top:14px">
         ${cuerpo}
         <div class="secc">Desde otro dispositivo</div>
-        <button class="opt" onclick="leerDelSistema()">📥 Leer del portapapeles del celular<small>Pegá acá el texto que copiaste con "Copiar rutina" en otro teléfono</small></button>
+        <button class="opt sl" onclick="leerDelSistema()">📥 Leer del portapapeles del celular<small>Pegá acá el texto que copiaste con "Copiar rutina" en otro teléfono</small></button>
       </div>
     </div>
   </div>`;
@@ -1576,8 +1787,8 @@ function pedirTexto(){
       <textarea id="clip-txt" rows="5" style="width:100%;resize:vertical;font-size:.8rem" placeholder='{"app":"misrutinas",...}'></textarea>
       <div style="height:14px"></div>
       <div class="row">
-        <button class="btn ghost sm" style="flex:1" onclick="renderPegar()">Volver</button>
-        <button class="btn sm" style="flex:1" onclick="usarTexto(document.getElementById('clip-txt').value)">Usar</button>
+        <button class="btn ghost sm sl" style="flex:1" onclick="renderPegar()">Volver</button>
+        <button class="btn sm sl" style="flex:1" onclick="usarTexto(document.getElementById('clip-txt').value)">Usar</button>
       </div>
     </div>
   </div>`;
@@ -1617,7 +1828,8 @@ function toast(msg){
   if(t) t.remove();
   t=document.createElement('div'); t.id='toast'; t.className='toast'; t.textContent=msg;
   document.body.appendChild(t);
-  toastT=setTimeout(()=>t.remove(),2200);
+  document.body.classList.add('snack');   // hace lugar: el FAB sube mientras dura el aviso
+  toastT=setTimeout(()=>{ t.remove(); document.body.classList.remove('snack'); },2600);
 }
 document.addEventListener('click',e=>{
   if(menuAbierto!=null&&!e.target.closest('.menu')&&!e.target.closest('.menu-btn')){ menuAbierto=null; rerender(); }
