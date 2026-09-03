@@ -2,7 +2,7 @@
    index.html se busca primero en la red (para recibir actualizaciones)
    y cae al caché si no hay conexión. El resto se sirve del caché.
    Además programa la notificación de "descanso terminado" del cronómetro. */
-const CACHE = 'rutinas-v3';
+const CACHE = 'rutinas-v4';
 const ARCHIVOS = ['./', './index.html', './manifest.webmanifest', './icon-192.png', './icon-512.png'];
 
 self.addEventListener('install', e => {

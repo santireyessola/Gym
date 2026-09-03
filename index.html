@@ -11,20 +11,23 @@
 <title>Mis Rutinas</title>
 <style>
 :root{
-  /* ===== Material 3 · esquema oscuro =====
-     Primario azul (continuidad con la identidad previa), terciario verde para logros/PRs.
-     Los nombres siguen los roles de M3: un rol de color siempre se usa con su "on-" par. */
-  --primary:#86d1ff; --on-primary:#00344b; --primary-c:#004b6b; --on-primary-c:#c7e7ff;
-  --secondary:#b5c9d7; --on-secondary:#20333e; --secondary-c:#364955; --on-secondary-c:#d1e5f4;
-  --tertiary:#7bdca0; --on-tertiary:#00391f; --tertiary-c:#00522f; --on-tertiary-c:#97f9bb;
+  /* ===== Paleta "fuego" sobre oscuro cálido =====
+     Naranja = energía y acento principal. Verde = series/objetivos cumplidos.
+     Dorado = récords y logros (se usa poco, para que cuando aparezca signifique algo).
+     Se mantienen los roles de M3 (cada color con su par "on-") como chasis del sistema. */
+  --primary:#ff7a18; --on-primary:#2a1000; --primary-c:#7a2f00; --on-primary-c:#ffdcc6;
+  --flame:#ff7a18; --flame-soft:#ffa24d; --flame-glow:rgba(255,122,24,.35);
+  --secondary:#e0c3b2; --on-secondary:#3a2418; --secondary-c:#53372a; --on-secondary-c:#ffdcc6;
+  --tertiary:#6fdc9b; --on-tertiary:#00391f; --tertiary-c:#00522f; --on-tertiary-c:#97f9bb;
+  --gold:#ffd24a; --on-gold:#3a2c00; --gold-c:#5c4600;
   --error:#ffb4ab; --on-error:#690005; --error-c:#93000a; --on-error-c:#ffdad6;
   --warn:#ffd8a0;
-  /* superficies tonales (M3 no usa negro puro en oscuro) */
-  --surface:#0e1418; --surface-bright:#343a3e;
-  --sc-lowest:#090f12; --sc-low:#161c20; --sc:#1a2024; --sc-high:#252b2f; --sc-highest:#2f353a;
-  --on-surface:#dfe3e7; --on-surface-var:#bfc8ce;
-  --outline:#899298; --outline-var:#3f484e;
-  --inverse-surface:#dfe3e7; --inverse-on-surface:#2c3134;
+  /* superficies: neutro oscuro con un toque cálido, para que el naranja no choque */
+  --surface:#0f0d0c; --surface-bright:#332d29;
+  --sc-lowest:#0a0908; --sc-low:#171412; --sc:#1d1917; --sc-high:#282320; --sc-highest:#332d29;
+  --on-surface:#f0ebe8; --on-surface-var:#c4bab4;
+  --outline:#8c8079; --outline-var:#443c37;
+  --inverse-surface:#f0ebe8; --inverse-on-surface:#2c2724;
   /* forma */
   --r-xs:4px; --r-s:8px; --r-m:12px; --r-l:16px; --r-xl:28px; --r-full:9999px;
   /* movimiento: curvas y duraciones de M3 */
@@ -108,8 +111,8 @@ h3{font-size:1rem; line-height:1.5rem; font-weight:500; letter-spacing:.009em;}
 .btn.sm{min-height:32px; padding:6px 16px; font-size:.8125rem;}
 /* FAB extendido: la acción principal de la pantalla */
 .fab{--fy:0px; position:fixed; right:16px; bottom:96px; z-index:55; display:inline-flex; align-items:center; gap:12px;
-  min-height:56px; padding:0 20px; border-radius:var(--r-l); background:var(--primary-c); color:var(--on-primary-c);
-  box-shadow:var(--el3); font-size:.875rem; font-weight:600; letter-spacing:.006em;
+  min-height:56px; padding:0 20px; border-radius:var(--r-l); background:var(--primary); color:var(--on-primary);
+  box-shadow:var(--el3), 0 0 24px var(--flame-glow); font-size:.875rem; font-weight:700; letter-spacing:.006em;
   animation:fabIn var(--d-l) var(--e-emph-dec) backwards;
   transform:translateY(var(--fy)); transition:transform var(--d-m) var(--e-emph);}
 .fab:active{transform:translateY(var(--fy)) scale(.94);}
@@ -320,6 +323,112 @@ details .body{background:var(--sc-low); border-radius:0 0 var(--r-m) var(--r-m);
 .opt:active{transform:scale(.98);}
 .opt small{display:block; color:var(--on-surface-var); font-weight:400; margin-top:4px; font-size:.75rem; line-height:1rem;}
 
+/* ============ ENTRENAR: lista compacta + modo foco ============ */
+.sprog{height:6px; background:var(--sc-high); border-radius:var(--r-full); overflow:hidden; margin-bottom:16px;}
+.sprog i{display:block; height:100%; background:var(--flame); border-radius:var(--r-full);
+  box-shadow:0 0 10px var(--flame-glow); transition:width var(--d-l) var(--e-emph-dec);}
+.excard{display:flex; align-items:center; gap:14px; width:100%; text-align:left; background:var(--sc-low);
+  border-radius:var(--r-m); padding:14px; margin-bottom:8px; box-shadow:var(--el1);
+  transition:transform var(--d-s) var(--e-emph), background var(--d-m) var(--e-std);}
+.excard:active{transform:scale(.985);}
+.excard.ok{background:linear-gradient(100deg,var(--tertiary-c) 0%,var(--sc-low) 78%);}
+.excard .ex-n{width:34px; height:34px; border-radius:50%; background:var(--sc-highest); flex-shrink:0;
+  display:flex; align-items:center; justify-content:center; font-weight:700; font-size:.8125rem;}
+.excard.ok .ex-n{background:var(--tertiary); color:var(--on-tertiary);}
+.excard .ex-m{flex:1; min-width:0;}
+.excard .ex-m b{display:block; font-size:.9375rem; font-weight:600; line-height:1.25rem;}
+.excard .ex-m small{display:block; color:var(--on-surface-var); font-size:.75rem; margin-top:3px;
+  white-space:nowrap; overflow:hidden; text-overflow:ellipsis;}
+.excard .ex-p{font-size:.8125rem; font-weight:700; color:var(--on-surface-var); flex-shrink:0;
+  font-variant-numeric:tabular-nums;}
+.excard.ok .ex-p{color:var(--tertiary);}
+/* modo foco: un ejercicio a pantalla completa, con controles grandes */
+.foco{position:fixed; inset:0; z-index:100; background:var(--surface); overflow-y:auto;
+  display:flex; flex-direction:column; animation:focoIn var(--d-m) var(--e-emph-dec);}
+.foco-b{flex:1; display:flex; flex-direction:column;}
+.foco-b .foco-nav{margin-top:auto;}
+@keyframes focoIn{from{opacity:0; transform:scale(1.05);} to{opacity:1; transform:scale(1);}}
+.foco-h{display:flex; align-items:center; justify-content:space-between; gap:8px; padding:8px 4px 0 16px;}
+.foco-h .cnt{font-size:.75rem; color:var(--on-surface-var); font-weight:600;}
+.foco-b{padding:4px 16px 20px;}
+.foco-b h2{font-size:1.5rem; line-height:1.9rem; font-weight:700; letter-spacing:-.6px;}
+.foco-b .sub{color:var(--on-surface-var); font-size:.8125rem; margin-top:4px; display:block;}
+.fserie{display:grid; grid-template-columns:38px 1fr 1fr 60px; gap:10px; align-items:center;
+  background:var(--sc-low); border-radius:var(--r-l); padding:10px; margin-bottom:10px;
+  transition:background var(--d-m) var(--e-std);}
+.fserie.done{background:linear-gradient(100deg,var(--tertiary-c) 0%,var(--sc-low) 90%);}
+.fserie .n{font-size:.8125rem; font-weight:700; color:var(--on-surface-var); text-align:center;}
+.fserie input{width:100%; min-width:0; text-align:center; font-size:1.3rem; font-weight:700; padding:14px 4px;
+  background:var(--sc-high); border-radius:var(--r-m); border:none; border-bottom:2px solid transparent;}
+.fserie input:focus{border-bottom-color:var(--flame); background:var(--sc-highest); box-shadow:none;}
+.fserie .u{position:absolute; font-size:.625rem;}
+.fchk{width:60px; height:60px; border-radius:var(--r-m); background:var(--sc-high); color:var(--on-surface-var);
+  display:flex; align-items:center; justify-content:center; font-size:1.6rem;
+  transition:background var(--d-s) var(--e-std), color var(--d-s) var(--e-std), transform var(--d-s) var(--e-emph);}
+.fchk.ok{background:var(--tertiary); color:var(--on-tertiary); animation:pop var(--d-m) var(--e-emph-dec);}
+/* la navegación queda pegada abajo: es donde cae el pulgar entre serie y serie */
+.foco-nav{display:flex; gap:10px; margin-top:18px; position:sticky; bottom:0; padding:14px 0 4px;
+  background:linear-gradient(to top,var(--surface) 62%,transparent);}
+.foco-nav .btn{min-height:52px;}
+/* ============ CAPA DE JUEGO: anillos, racha, logros ============ */
+/* Tarjeta principal del panel: el resumen de tu semana */
+.hero{background:linear-gradient(160deg,var(--sc-high) 0%,var(--sc-low) 70%); border-radius:var(--r-xl);
+  padding:20px 16px 18px; margin-bottom:12px; position:relative; overflow:hidden; box-shadow:var(--el2);}
+/* resplandor cálido detrás del anillo */
+.hero::before{content:''; position:absolute; top:-70px; left:50%; width:260px; height:260px; margin-left:-130px;
+  background:radial-gradient(circle,var(--flame-glow) 0%,transparent 68%); pointer-events:none;}
+.hero-top{display:flex; justify-content:space-between; align-items:flex-start; position:relative;}
+/* Racha: el número que querés no perder */
+.racha{display:inline-flex; align-items:center; gap:6px; background:var(--sc-highest); border-radius:var(--r-full);
+  padding:7px 14px 7px 10px; font-weight:700; font-size:.875rem;}
+.racha .f{font-size:1.1rem; animation:llama 2.2s ease-in-out infinite; transform-origin:bottom center;}
+.racha.viva{background:var(--primary-c); color:var(--on-primary-c);}
+@keyframes llama{0%,100%{transform:scale(1) rotate(-3deg)} 50%{transform:scale(1.16) rotate(3deg)}}
+/* Anillo de progreso genérico */
+.pring{position:relative; margin:6px auto 0;}
+.pring svg{width:100%; height:100%; transform:rotate(-90deg); overflow:visible;}
+.pring .bg{fill:none; stroke:var(--sc-highest); stroke-width:14;}
+.pring .fg{fill:none; stroke:var(--flame); stroke-width:14; stroke-linecap:round;
+  filter:drop-shadow(0 0 7px var(--flame-glow));
+  transition:stroke-dashoffset var(--d-l) var(--e-emph-dec);}
+.pring.hecho .fg{stroke:var(--tertiary); filter:drop-shadow(0 0 8px rgba(111,220,155,.4));}
+.pring .centro{position:absolute; inset:0; display:flex; flex-direction:column; align-items:center; justify-content:center;}
+.pring .num{font-size:2.6rem; font-weight:800; line-height:1; letter-spacing:-1.5px; font-variant-numeric:tabular-nums;}
+.pring .cap{font-size:.6875rem; color:var(--on-surface-var); letter-spacing:.045em; text-transform:uppercase;
+  font-weight:600; margin-top:4px;}
+/* Fila de indicadores */
+.kpis{display:grid; grid-template-columns:repeat(3,1fr); gap:8px; margin-bottom:12px;}
+.kpi{background:var(--sc-low); border-radius:var(--r-m); padding:13px 8px; text-align:center; box-shadow:var(--el1);}
+.kpi b{display:block; font-size:1.25rem; font-weight:700; line-height:1.4rem; font-variant-numeric:tabular-nums;}
+.kpi span{display:block; font-size:.625rem; color:var(--on-surface-var); letter-spacing:.04em; margin-top:4px;
+  font-weight:600; text-transform:uppercase;}
+/* Logros: fila que se desliza en horizontal */
+.logros{display:flex; gap:10px; overflow-x:auto; padding:2px 2px 8px; scroll-snap-type:x proximity;
+  scrollbar-width:none;}
+.logros::-webkit-scrollbar{display:none;}
+.logro{flex:0 0 88px; scroll-snap-align:start; background:var(--sc-low); border-radius:var(--r-m);
+  padding:12px 6px 10px; text-align:center; opacity:.42; filter:grayscale(1);
+  display:flex; flex-direction:column; justify-content:flex-start; min-height:104px;
+  transition:opacity var(--d-m) var(--e-emph), filter var(--d-m) var(--e-emph), transform var(--d-s) var(--e-emph);}
+.logro .pg{margin-top:auto;}
+.logro.on{opacity:1; filter:none; background:linear-gradient(160deg,var(--gold-c),var(--sc-low));}
+.logro:active{transform:scale(.95);}
+.logro .ic{font-size:1.65rem; line-height:1.9rem; display:block;}
+.logro .nm{font-size:.625rem; font-weight:700; line-height:.85rem; margin-top:5px; display:block;}
+.logro.on .nm{color:var(--gold);}
+.logro .pg{font-size:.5625rem; color:var(--on-surface-var); display:block; margin-top:2px;}
+/* Celebración de récord: destello dorado + partículas */
+.conf{position:fixed; inset:0; z-index:390; pointer-events:none; overflow:hidden;}
+.conf i{position:absolute; width:9px; height:9px; border-radius:2px; will-change:transform,opacity;
+  animation:caer 1.5s var(--e-std-dec) forwards;}
+@keyframes caer{
+  0%{transform:translateY(0) rotate(0) scale(1); opacity:1;}
+  100%{transform:translateY(105vh) rotate(680deg) scale(.5); opacity:0;}
+}
+.pr-flash{position:fixed; inset:0; z-index:385; pointer-events:none;
+  background:radial-gradient(circle at 50% 42%,rgba(255,210,74,.4),transparent 62%);
+  animation:prFlash .85s var(--e-emph-dec) forwards;}
+@keyframes prFlash{0%{opacity:0} 25%{opacity:1} 100%{opacity:0}}
 /* ============ MOVIMIENTO ============ */
 /* entrada escalonada de listas: cada elemento entra un toque después del anterior */
 .stagger>*{animation:enter var(--d-m) var(--e-emph-dec) backwards;}
@@ -350,7 +459,7 @@ details .body{background:var(--sc-low); border-radius:0 0 var(--r-m) var(--r-m);
 /* ============ DATOS BASE ============ */
 const MUSCULOS = ['Pecho','Espalda','Hombros','Bíceps','Tríceps','Cuádriceps','Femoral','Glúteos','Gemelos','Abdominales','Trapecios','Antebrazos'];
 const DIAS_SEM = ['Lunes','Martes','Miércoles','Jueves','Viernes','Sábado','Domingo'];
-const COLORES = ['#1d9bf0','#00ba7c','#f91880','#ffd400','#ff7a00','#7856ff','#f4212e','#8ecdf8'];
+const COLORES = ['#ff7a18','#ffd24a','#6fdc9b','#ff5d73','#c084fc','#4cc9f0','#fb923c','#e879f9'];
 const EMOJIS = ['💪','🏋️','🔥','⚡','🦵','🏆','🎯','🐺'];
 
 /* [nombre, músculo, tier(1=compuesto 2=secundario 3=aislamiento), reps por defecto] */
@@ -451,6 +560,7 @@ function normalizar(){
   if(!S.desde) S.desde=hoy();
   if(S.ultimoRespaldo===undefined) S.ultimoRespaldo=null;
   if(!S.logs) S.logs={};
+  if(!Array.isArray(S.logrosVistos)) S.logrosVistos=[];
   // migración: el historial de peso/reps vivía por instancia de ejercicio (por día),
   // por eso el mismo ejercicio en dos días no se veía conectado. Se junta todo en
   // S.logs (por ejercicio, global) y se borra de la instancia vieja — idempotente,
@@ -482,6 +592,81 @@ function rachaSemanas(fechas){
   let n=0;
   while(sem.has(lun)){ n++; const d=new Date(lun+'T12:00:00'); d.setDate(d.getDate()-7); lun=isoDe(d); }
   return n;
+}
+/* ============ ESTADÍSTICAS Y LOGROS ============
+   Todo se calcula a partir de los datos que ya existen (sesiones + historial de pesos).
+   Lo único que se guarda aparte es qué logros ya te festejamos, para no repetir. */
+function sesionesTodas(){ return S.rutinas.flatMap(r=>r.sesiones||[]); }
+function seriesSesion(s){ return (s.ej||[]).reduce((a,e)=>a+(e.series||[]).length,0); }
+function tonelajeSesion(s){
+  return (s.ej||[]).reduce((a,e)=>a+(e.series||[]).reduce((b,x)=>b+((+x.p||0)*(+x.r||0)),0),0);
+}
+/* Un récord es una marca que superó a todas las anteriores de ese ejercicio.
+   La primera carga no cuenta: no superaste nada todavía. */
+function contarPRs(){
+  let n=0;
+  Object.values(S.logs||{}).forEach(l=>{
+    let max=null;
+    l.forEach(x=>{ if(x.p!=null){ if(max!=null&&x.p>max) n++; if(max==null||x.p>max) max=x.p; } });
+  });
+  return n;
+}
+function metaSemanal(){ return Math.max(1,...S.rutinas.map(r=>r.dias.length||1)); }
+function estadisticas(){
+  const ses=sesionesTodas();
+  const fechas=new Set(); S.rutinas.forEach(r=>fechasEntrenadas(r).forEach(f=>fechas.add(f)));
+  const sem=claveSemana(hoy()), mes=hoy().slice(0,7);
+  const estaSem=ses.filter(s=>claveSemana(s.f)===sem);
+  const esteMes=ses.filter(s=>String(s.f).startsWith(mes));
+  return {
+    total:ses.length, semana:estaSem.length, mes:esteMes.length,
+    racha:rachaSemanas(fechas), meta:metaSemanal(),
+    seriesSemana:estaSem.reduce((a,s)=>a+seriesSesion(s),0),
+    tonMes:esteMes.reduce((a,s)=>a+tonelajeSesion(s),0),
+    tonMax:ses.reduce((a,s)=>Math.max(a,tonelajeSesion(s)),0),
+    prs:contarPRs(), dias:fechas.size
+  };
+}
+const LOGROS=[
+ {id:'primer', ic:'🎯', nom:'Primer paso',      desc:'Completá tu primer entrenamiento',    meta:1,     val:e=>e.total},
+ {id:'ses10',  ic:'💪', nom:'Constante',        desc:'10 entrenamientos',                   meta:10,    val:e=>e.total},
+ {id:'ses25',  ic:'🔥', nom:'En llamas',        desc:'25 entrenamientos',                   meta:25,    val:e=>e.total},
+ {id:'ses50',  ic:'⚡', nom:'Imparable',        desc:'50 entrenamientos',                   meta:50,    val:e=>e.total},
+ {id:'ses100', ic:'🏆', nom:'Centurión',        desc:'100 entrenamientos',                  meta:100,   val:e=>e.total},
+ {id:'racha2', ic:'📅', nom:'Enganchado',       desc:'2 semanas seguidas sin faltar',       meta:2,     val:e=>e.racha},
+ {id:'racha4', ic:'🗓️', nom:'Un mes entero',    desc:'4 semanas seguidas sin faltar',       meta:4,     val:e=>e.racha},
+ {id:'racha12',ic:'👑', nom:'Tres meses',       desc:'12 semanas seguidas sin faltar',      meta:12,    val:e=>e.racha},
+ {id:'pr1',    ic:'⭐', nom:'Superate',         desc:'Rompé tu primer récord de peso',      meta:1,     val:e=>e.prs},
+ {id:'pr10',   ic:'🚀', nom:'Rompiendo techos', desc:'10 récords de peso',                  meta:10,    val:e=>e.prs},
+ {id:'ton5',   ic:'🐘', nom:'5 toneladas',      desc:'5.000 kg movidos en un entrenamiento',meta:5000,  val:e=>e.tonMax},
+ {id:'ton10',  ic:'🦣', nom:'10 toneladas',     desc:'10.000 kg en un entrenamiento',       meta:10000, val:e=>e.tonMax},
+];
+function logrosCon(e){ return LOGROS.map(l=>{ const v=l.val(e); return {...l,val:v,on:v>=l.meta}; }); }
+/* Se llama después de guardar progreso: si desbloqueaste algo nuevo, lo festeja una sola vez. */
+function revisarLogros(){
+  const nuevos=logrosCon(estadisticas()).filter(l=>l.on&&!S.logrosVistos.includes(l.id));
+  if(!nuevos.length) return;
+  S.logrosVistos.push(...nuevos.map(l=>l.id)); guardar();
+  celebrar('¡Logro desbloqueado! '+nuevos[0].ic+' '+nuevos[0].nom);
+}
+/* Destello + papelitos + vibración. Respeta "reducir movimiento". */
+function celebrar(msg){
+  if(!menosMovimiento()){
+    const flash=document.createElement('div'); flash.className='pr-flash';
+    document.body.appendChild(flash); setTimeout(()=>flash.remove(),900);
+    const caja=document.createElement('div'); caja.className='conf';
+    const cols=['#ffd24a','#ff7a18','#ffa24d','#6fdc9b','#ffffff'];
+    for(let i=0;i<34;i++){
+      const p=document.createElement('i');
+      p.style.cssText=`left:${(Math.random()*100).toFixed(1)}%;top:${(-8-Math.random()*14).toFixed(1)}%;`
+        +`background:${cols[i%cols.length]};animation-delay:${(Math.random()*.35).toFixed(2)}s;`
+        +`animation-duration:${(1.1+Math.random()*.9).toFixed(2)}s`;
+      caja.appendChild(p);
+    }
+    document.body.appendChild(caja); setTimeout(()=>caja.remove(),2600);
+  }
+  if(navigator.vibrate) navigator.vibrate([40,60,120]);
+  toast(msg);
 }
 function exPorId(id){ return S.ejercicios.find(e=>e.id===id); }
 function rutina(id){ return S.rutinas.find(r=>r.id===id); }
@@ -656,11 +841,17 @@ function pintarApp(){
 function ajustarEspacioCrono(){
   const app=document.getElementById('app');
   const tp=document.querySelector('.tpanel');
+  const fab=document.querySelector('.fab');
   const enSesion=vista.p==='sesion';
-  const alto=(enSesion?0:80)+(tp?tp.offsetHeight:0)+16;   // nav bar + cronómetro + aire
+  // nav bar + cronómetro + FAB (que flota y si no taparía el final de la lista) + aire
+  const alto=(enSesion?0:80)+(tp?tp.offsetHeight:0)+(fab?fab.offsetHeight+12:0)+16;
   const sp=document.createElement('div');
   sp.style.cssText='height:'+alto+'px;flex-shrink:0';
   app.appendChild(sp);
+  // El modo foco es una capa fija aparte. Cuando el cronómetro está abierto le subimos
+  // el borde inferior, así su navegación pegada abajo queda por encima del panel.
+  const foco=document.querySelector('.foco');
+  if(foco) foco.style.bottom=(tp?tp.offsetHeight:0)+'px';
 }
 /* render() = cambio de pantalla: usa View Transitions para el fundido entre vistas.
    rerender() = actualización en el lugar (tipeo, toggles): siempre directo, porque una
@@ -710,7 +901,68 @@ const icoAtras='<svg viewBox="0 0 24 24" fill="currentColor" style="width:24px;h
 /* ---- INICIO ---- */
 const icoCopiar='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:17px;height:17px"><rect x="9" y="9" width="11.5" height="11.5" rx="2.5"/><path d="M5.5 15H5a2 2 0 0 1-2-2V5.5a2 2 0 0 1 2-2H13a2 2 0 0 1 2 2V6"/></svg>';
 const icoPegar='<svg viewBox="0 0 24 24" fill="currentColor" style="width:22px;height:22px"><path d="M19 2h-4.2a3 3 0 0 0-5.6 0H5a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V4a2 2 0 0 0-2-2m-7 0a1 1 0 1 1 0 2 1 1 0 0 1 0-2m7 18H5V4h2v3h10V4h2z"/></svg>';
+/* ---- PANEL DE PROGRESO (lo primero que ves al abrir) ---- */
+function fKg(kg){ return kg>=1000?(Math.round(kg/100)/10).toString().replace('.',',')+' t':Math.round(kg)+''; }
+function anilloSemana(e){
+  const R=62, C=2*Math.PI*R;
+  const pct=e.meta?Math.min(1,e.semana/e.meta):0;
+  return `<div class="pring ${pct>=1?'hecho':''}" style="width:158px;height:158px">
+    <svg viewBox="0 0 158 158">
+      <circle class="bg" cx="79" cy="79" r="${R}"/>
+      <circle class="fg" cx="79" cy="79" r="${R}" stroke-dasharray="${C.toFixed(1)}"
+        stroke-dashoffset="${(C*(1-pct)).toFixed(1)}"/>
+    </svg>
+    <div class="centro"><span class="num">${e.semana}</span><span class="cap">de ${e.meta} esta semana</span></div>
+  </div>`;
+}
+function textoMotivacion(e){
+  if(!e.total) return 'Tu primer entrenamiento te espera';
+  if(e.semana>=e.meta) return '¡Semana completa! 🎉';
+  const f=e.meta-e.semana;
+  return f===1?'Te falta 1 entrenamiento para cerrar la semana'
+              :'Te faltan '+f+' entrenamientos para cerrar la semana';
+}
+function heroPanel(e){
+  return `<div class="hero">
+    <div class="hero-top">
+      <div>
+        <div class="t-label" style="color:var(--on-surface-var);text-transform:uppercase">Esta semana</div>
+        <div style="font-size:1.3rem;font-weight:700;margin-top:2px;letter-spacing:-.3px">
+          ${e.semana?'Vas bien':'A arrancar'}</div>
+      </div>
+      <span class="racha ${e.racha>0?'viva':''}" title="Semanas seguidas entrenando">
+        <span class="f">🔥</span>${e.racha}</span>
+    </div>
+    ${anilloSemana(e)}
+    <div style="text-align:center;margin-top:12px;font-size:.8125rem;color:var(--on-surface-var);position:relative">
+      ${textoMotivacion(e)}
+    </div>
+  </div>
+  <div class="kpis">
+    <div class="kpi"><b>${e.seriesSemana}</b><span>Series semana</span></div>
+    <div class="kpi"><b style="color:var(--gold)">${e.prs}</b><span>Récords</span></div>
+    <div class="kpi"><b>${fKg(e.tonMes)}</b><span>Kg este mes</span></div>
+  </div>`;
+}
+function panelLogros(){
+  const lg=logrosCon(estadisticas());
+  const n=lg.filter(l=>l.on).length;
+  // primero los conseguidos, después los que tenés más cerca de conseguir
+  const orden=[...lg].sort((a,b)=>(b.on-a.on)||(b.val/b.meta-a.val/a.meta));
+  return `<div class="secc" style="display:flex;justify-content:space-between;align-items:baseline">
+      <span>Logros</span><span style="color:var(--gold);font-weight:700">${n}/${lg.length}</span></div>
+    <div class="logros">${orden.map(l=>`
+      <button class="logro sl ${l.on?'on':''}" onclick="verLogro('${l.id}')">
+        <span class="ic">${l.ic}</span><span class="nm">${esc(l.nom)}</span>
+        <span class="pg">${l.on?'conseguido':Math.min(l.val,l.meta)+' / '+l.meta}</span>
+      </button>`).join('')}</div>`;
+}
+function verLogro(id){
+  const l=logrosCon(estadisticas()).find(x=>x.id===id); if(!l) return;
+  toast(l.on?l.ic+' '+l.nom+': '+l.desc:l.desc+' — vas '+Math.min(l.val,l.meta)+' de '+l.meta);
+}
 function vInicio(){
+  const est=estadisticas();
   let cards;
   if(!S.rutinas.length){
     cards=`<div class="empty"><div class="big">🏋️</div>Todavía no tenés rutinas.<br>Creá la primera con el botón de abajo.</div>`;
@@ -734,6 +986,8 @@ function vInicio(){
     ${bannerInstalar()}
     ${bannerRespaldo()}
     ${portapapeles?`<p class="hint" style="text-align:center">Copiada: <b>${esc(portapapeles.nombre||'Rutina')}</b> — tocá el ícono de pegar arriba para usarla</p>`:''}
+    ${S.rutinas.length?heroPanel(est):''}
+    ${est.total?panelLogros():''}
     ${cards}
     ${vCalendario()}
     <div style="height:18px"></div>
@@ -909,7 +1163,8 @@ function logEj(di,ei,campo,val){
     nuevo[campo]=v; l.push(nuevo);
   }
   guardar(); rerender();
-  if(campo==='p'&&v!=null&&prevPR!=null&&v>prevPR) toast('🏆 ¡Nuevo récord! '+v+' kg');
+  if(campo==='p'&&v!=null&&prevPR!=null&&v>prevPR) celebrar('🏆 ¡Nuevo récord! '+v+' kg');
+  revisarLogros();
 }
 function moverEj(di,ei,dir){
   const list=rutina(vista.rid).dias[di].ejercicios;
@@ -1297,6 +1552,8 @@ function empezarSesion(di){
     })};
   guardar(); vista={p:'sesion'}; render();
 }
+/* La sesión se ve como una lista compacta (dónde estoy parado en el día) y cada
+   ejercicio se abre a pantalla completa para cargar las series con el dedo. */
 function vSesion(){
   const s=S.sesionActiva; if(!s){ vista={p:'inicio'}; return vInicio(); }
   const r=rutina(s.rid); if(!r){ S.sesionActiva=null; vista={p:'inicio'}; return vInicio(); }
@@ -1304,35 +1561,27 @@ function vSesion(){
   const cards=s.ej.map((se,i)=>{
     const ex=exPorId(se.exId)||{nombre:'?',musculo:''};
     const u=ultLog(se.exId);
-    const tope=repsTope(se.reps);
-    const subir=u&&u.r!=null&&tope&&u.r>=tope;
-    const filas=se.series.map((st,j)=>`
-      <div class="srow ${st.ok?'done':''}">
-        <span style="color:var(--on-surface-var);font-size:.8rem">Serie ${j+1}</span>
-        <input type="number" step="0.5" placeholder="kg" value="${st.p!=null?st.p:''}" onchange="setSerie(${i},${j},'p',this.value)">
-        <input type="number" placeholder="reps" value="${st.r!=null?st.r:''}" onchange="setSerie(${i},${j},'r',this.value)">
-        <button class="chk sl ${st.ok?'ok':''}" onclick="checkSerie(${i},${j})">✓</button>
-      </div>`).join('');
-    return `<div class="card">
-      <div class="row" style="justify-content:space-between;align-items:flex-start">
-        <div style="min-width:0"><b>${esc(ex.nombre)}</b>
-          <small style="display:block;color:var(--on-surface-var)">${ex.musculo} · objetivo ${se.series.length}×${esc(se.reps)}${u?' · últ. '+(u.p!=null?u.p+' kg':'')+(u.r!=null?' × '+u.r:''):''}</small>
-          ${se.nota?`<small style="display:block;color:var(--primary);font-style:italic">${esc(se.nota)}</small>`:''}
-        </div>
-        ${subir?'<span style="color:var(--tertiary);font-weight:700;font-size:.78rem;white-space:nowrap">↑ subí peso</span>':''}
-      </div>
-      <div style="height:6px"></div>
-      ${filas}
-    </div>`;
+    const hechas=se.series.filter(x=>x.ok).length;
+    const completo=hechas===se.series.length;
+    return `<button class="excard sl ${completo?'ok':''}" onclick="abrirFoco(${i})">
+      <span class="ex-n">${completo?'✓':i+1}</span>
+      <span class="ex-m">
+        <b>${esc(ex.nombre)}</b>
+        <small>${se.series.length}×${esc(se.reps)}${u&&u.p!=null?' · últ. '+u.p+' kg':''}${se.nota?' · '+esc(se.nota):''}</small>
+      </span>
+      <span class="ex-p">${hechas}/${se.series.length}</span>
+    </button>`;
   }).join('');
   const hechoN=s.ej.reduce((a,se)=>a+se.series.filter(x=>x.ok).length,0);
   const totN=s.ej.reduce((a,se)=>a+se.series.length,0);
+  const pct=totN?Math.round(hechoN/totN*100):0;
   return `<div class="hdr">
-    <div><h1>${d.dia} <small style="color:var(--on-surface-var);font-weight:400;font-size:.95rem">· ${esc(d.titulo)}</small></h1>
-    <small style="color:var(--on-surface-var)">${hechoN}/${totN} series completadas</small></div>
+    <div style="min-width:0"><h1>${d.dia} <small style="color:var(--on-surface-var);font-weight:400;font-size:.95rem">· ${esc(d.titulo)}</small></h1>
+    <small style="color:var(--on-surface-var)">${hechoN} de ${totN} series · ${pct}%</small></div>
     <button class="back sl" aria-label="Salir" onclick="salirSesion()">${icoCerrar}</button>
   </div>
-  <div class="wrap" style="padding-bottom:70px">
+  <div class="wrap">
+    <div class="sprog"><i style="width:${pct}%"></i></div>
     <div class="card">
       <div class="row" style="justify-content:space-between">
         <span style="color:var(--on-surface-var);font-size:.85rem;font-weight:600">Descanso entre series</span>
@@ -1344,10 +1593,56 @@ function vSesion(){
       ${avisoNotif()}
     </div>
     ${cards}
-    <button class="btn full sl" style="background:var(--tertiary)" onclick="terminarSesion()">Terminar entrenamiento</button>
+    <div style="height:8px"></div>
+    <button class="btn full sl" style="background:var(--tertiary);color:var(--on-tertiary)" onclick="terminarSesion()">Terminar entrenamiento</button>
     <div style="height:10px"></div>
     <button class="btn danger sm full sl" onclick="confirmar('¿Descartar este entrenamiento? No se guarda nada.','Descartar',descartarSesion)">Descartar</button>
+  </div>
+  ${vista.foco!=null?vFoco(s,vista.foco):''}`;
+}
+/* Modo foco: el ejercicio actual ocupa toda la pantalla, con controles del tamaño
+   de un dedo. Se navega con anterior/siguiente sin volver a la lista. */
+function vFoco(s,i){
+  const se=s.ej[i]; if(!se) return '';
+  const ex=exPorId(se.exId)||{nombre:'?',musculo:''};
+  const u=ultLog(se.exId);
+  const tope=repsTope(se.reps);
+  const subir=u&&u.r!=null&&tope&&u.r>=tope;
+  const filas=se.series.map((st,j)=>`
+    <div class="fserie ${st.ok?'done':''}">
+      <span class="n">${j+1}</span>
+      <input type="number" step="0.5" inputmode="decimal" placeholder="kg" value="${st.p!=null?st.p:''}"
+        onchange="setSerie(${i},${j},'p',this.value)" aria-label="Peso serie ${j+1}">
+      <input type="number" inputmode="numeric" placeholder="reps" value="${st.r!=null?st.r:''}"
+        onchange="setSerie(${i},${j},'r',this.value)" aria-label="Repeticiones serie ${j+1}">
+      <button class="fchk sl ${st.ok?'ok':''}" onclick="checkSerie(${i},${j})" aria-label="Marcar serie ${j+1}">✓</button>
+    </div>`).join('');
+  return `<div class="foco">
+    <div class="foco-h">
+      <span class="cnt">Ejercicio ${i+1} de ${s.ej.length}</span>
+      <button class="back sl" aria-label="Volver a la lista" onclick="cerrarFoco()">${icoCerrar}</button>
+    </div>
+    <div class="foco-b">
+      <h2>${esc(ex.nombre)}</h2>
+      <small class="sub">${ex.musculo} · objetivo ${se.series.length}×${esc(se.reps)}${u&&u.p!=null?' · últ. '+u.p+' kg'+(u.r!=null?' × '+u.r:''):''}</small>
+      ${subir?'<div style="margin-top:10px"><span class="racha viva" style="font-size:.8125rem">↑ Llegaste al tope de reps: subí el peso</span></div>':''}
+      ${se.nota?`<div style="margin-top:10px;color:var(--flame-soft);font-size:.8125rem;font-style:italic">${esc(se.nota)}</div>`:''}
+      <div style="height:18px"></div>
+      ${filas}
+      <div class="foco-nav">
+        <button class="btn ghost sl" style="flex:1${i===0?';opacity:.35':''}" ${i===0?'disabled':''} onclick="moverFoco(-1)">← Anterior</button>
+        <button class="btn sl" style="flex:1" onclick="${i===s.ej.length-1?'cerrarFoco()':'moverFoco(1)'}">${i===s.ej.length-1?'Listo':'Siguiente →'}</button>
+      </div>
+    </div>
   </div>`;
+}
+function abrirFoco(i){ vista.foco=i; rerender(); window.scrollTo(0,0); }
+function cerrarFoco(){ vista.foco=null; rerender(); }
+function moverFoco(d){
+  const s=S.sesionActiva; if(!s) return;
+  const n=vista.foco+d;
+  if(n<0||n>=s.ej.length) return;
+  vista.foco=n; rerender(); window.scrollTo(0,0);
 }
 function setSerie(i,j,c,v){ S.sesionActiva.ej[i].series[j][c]=v===''?null:+v; guardar(); }
 function checkSerie(i,j){
@@ -1558,7 +1853,9 @@ function finalizarSesion(){
   (r.sesiones=r.sesiones||[]).push(reg);
   S.sesionActiva=null; resetTimer();
   guardar(); vista={p:'rutina',rid:r.id,cfg:false,chartEx:null}; render();
-  toast(prs.length?'🏆 ¡Récord! '+prs.join(' · '):'Entrenamiento guardado · '+dur+' min 💪');
+  if(prs.length) celebrar('🏆 ¡Récord! '+prs.join(' · '));
+  else toast('Entrenamiento guardado · '+dur+' min 💪');
+  revisarLogros();
 }
 function descartarSesion(){
   const rid=S.sesionActiva?S.sesionActiva.rid:null;
