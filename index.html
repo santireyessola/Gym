@@ -2166,22 +2166,26 @@ function abrirJuego(id){
   S.ultimoJuego=id; guardar();
   juego=JUEGOS[id].crear();
   juego.id=id; juego.estado='listo'; juego.puntos=0; juego.motivo=''; juego.superado=false;
+  juego.arrancado=false; juego.cerrada=false;
   juego.morir=function(m){ this.estado='fin'; this.motivo=m||''; };
   vista.juego=id; rerender();
 }
 function jugarYa(){ if(juego){ jPendiente=true; juego.estado='jugando'; rerender(); } }
-function cerrarJuego(){ pararBucle(); juego=null; vista.juego=null; render(); }
-function terminarPartida(){
-  if(!juego) return;
+function cerrarJuego(){ guardarRecord(); pararBucle(); juego=null; vista.juego=null; render(); }
+/* Se llama una sola vez por partida (bandera `cerrada`): tanto al perder como al salir
+   con la X, para no tirar a la basura un puntaje que ya conseguiste. */
+function guardarRecord(){
+  if(!juego||juego.cerrada) return;
+  juego.cerrada=true;
   const id=juego.id, p=Math.round(juego.puntos);
   juego.superado = p>recordDe(id) && p>0;
-  if(juego.superado){
-    S.juegos[id].rec=p; guardar();
-    celebrar('🏆 ¡Récord en '+JUEGOS[id].nom+'! '+p+' '+JUEGOS[id].unidad);
-    revisarLogros();
-  }
-  rerender();
+  if(!juego.superado) return;
+  S.juegos[id].rec=p; guardar();
+  // primero los logros y despues el record: asi el aviso que queda visible es el del record
+  revisarLogros();
+  celebrar('🏆 ¡Récord en '+JUEGOS[id].nom+'! '+p+' '+JUEGOS[id].unidad);
 }
+function terminarPartida(){ guardarRecord(); rerender(); }
 /* El canvas se recrea en cada repintado (el estado del juego vive en JS, no en el DOM),
    así que acá lo volvemos a enganchar y seguimos donde estábamos. */
 function montarJuego(){
@@ -2195,7 +2199,10 @@ function montarJuego(){
   });
   c.addEventListener('pointermove',e=>{ if(juego&&juego.estado==='jugando'&&juego.mueve) juego.mueve(...jxy(e)); });
   c.addEventListener('pointerup',e=>{ if(juego&&juego.estado==='jugando'&&juego.arriba) juego.arriba(...jxy(e)); });
-  if(jPendiente){ jPendiente=false; juego.puntos=0; juego.motivo=''; juego.superado=false; juego.iniciar(); }
+  if(jPendiente){
+    jPendiente=false; juego.puntos=0; juego.motivo=''; juego.superado=false; juego.cerrada=false;
+    juego.iniciar(); juego.arrancado=true;   // recien ahora `dibujar` tiene estado que leer
+  }
   arrancarBucle();
 }
 function jxy(e){ const r=jcanvas.getBoundingClientRect(); return [e.clientX-r.left, e.clientY-r.top]; }
@@ -2212,16 +2219,27 @@ function arrancarBucle(){ pararBucle(); jt0=performance.now(); jraf=requestAnima
 function pararBucle(){ if(jraf) cancelAnimationFrame(jraf); jraf=null; }
 function jpaso(t){
   if(!juego||!jcanvas){ pararBucle(); return; }
-  jraf=requestAnimationFrame(jpaso);
   const dt=Math.min(.045,Math.max(0,(t-jt0)/1000)); jt0=t;
-  if(juego.estado==='jugando'){
-    juego.actualizar(dt);
-    if(juego.estado==='fin'){ pararBucle(); terminarPartida(); return; }
-  }
-  juego.dibujar(jcanvas.getContext('2d'));
+  if(juego.estado==='jugando') juego.actualizar(dt);
+  // Antes solo se miraba el fin justo despues de actualizar(), y Torre muere desde el
+  // handler del toque: la partida quedaba colgada sin guardar el record ni mostrar el
+  // cartel. Ahora se chequea siempre, venga de donde venga.
+  if(juego.arrancado) juego.dibujar(jcanvas.getContext('2d'));
   const n=document.getElementById('jpuntos');
   if(n) n.textContent=Math.round(juego.puntos);
+  // el fin se cierra UNA sola vez: terminarPartida() repinta, y el repintado vuelve a
+  // arrancar el bucle, asi que sin esta guarda quedaba repintando en loop a 60fps
+  if(juego.estado==='fin'){ pararBucle(); if(!juego.cerrada) terminarPartida(); return; }
+  // en 'listo' y en 'fin' la escena esta quieta: no tiene sentido repintar a 60fps
+  if(juego.estado==='jugando') jraf=requestAnimationFrame(jpaso); else pararBucle();
 }
+/* Si rotas el telefono o se colapsa la barra del navegador, el canvas queda del tamanio viejo. */
+window.addEventListener('resize',()=>{
+  if(!juego||!jcanvas) return;
+  dimensionarJuego();
+  if(juego.redimensionar) juego.redimensionar();
+  if(juego.estado!=='jugando') arrancarBucle();   // repinto una vez la escena quieta
+});
 /* ---- pantallas de la sección ---- */
 function vJuegos(){
   return `<div class="hdr"><h1>Juegos</h1></div>
@@ -2420,27 +2438,35 @@ function jDerrumbe(){
       const x0=W*.40, paso=bw*2.5;
       const maxCols=Math.max(2,Math.floor((W-10-x0-bw)/paso)+1);
       const cols=Math.min(maxCols,2+Math.floor((this.nivel-1)/2));
-      const alto=Math.min(7,3+Math.floor(this.nivel/3));
+      // La torre nunca puede pasar del espacio disponible: en una pantalla baja (o en
+      // horizontal) los bloques se generaban arriba del canvas, fuera de la vista.
+      const altoMax=Math.max(2,Math.floor((S-70)/(bw*.85)) - 1);
+      const alto=Math.min(7,altoMax,3+Math.floor(this.nivel/3));
+      // OJO con las alturas: la viga tiene que APOYAR sobre las columnas (su base en el tope
+      // de ellas) y el objetivo pararse ENCIMA de la viga. Si se solapan, cualquier roce de
+      // la viga cuenta como aplastar y el nivel se gana de un toque.
+      const yViga=S-alto*bh-bh*.7;
       for(let c=0;c<cols;c++){
         const px=x0+c*paso;
         for(let k=0;k<alto;k++) this.bloques.push(this.caja(px,S-(k+1)*bh,bw,bh));
-        // viga horizontal que une cada par de columnas
-        if(c>0) this.bloques.push(this.caja(px-paso,S-(alto+1)*bh,paso+bw,bh*.7));
-        // objetivo apoyado arriba de la columna, alternando
-        if(c%2===0) this.objetivos.push({x:px+bw/2, y:S-alto*bh-16, r:15, vivo:true});
+        if(c>0) this.bloques.push(this.caja(px-paso,yViga,paso+bw,bh*.7));
+        if(c%2===0) this.objetivos.push({x:px+bw/2, y:yViga-16, r:15, vivo:true});
       }
       if(!this.objetivos.length) this.objetivos.push({x:x0+bw/2, y:S-16, r:15, vivo:true});
     },
     caja(x,y,w,h){ return {x,y,w,h,vx:0,vy:0,dorm:true,vivo:true}; },
-    abajo(x,y){ if(!this.proy||!this.proy.act) this.drag={x,y}; },
+    abajo(x,y){ if(this.tiros>0&&(!this.proy||!this.proy.act)) this.drag={x,y}; },
     mueve(x,y){ if(this.drag) this.drag={x,y}; },
     arriba(){
       if(!this.drag) return;
       const dx=this.gom.x-this.drag.x, dy=this.gom.y-this.drag.y;
       const d=Math.hypot(dx,dy);
       this.drag=null;
-      if(d<12) return;
+      if(d<12||this.tiros<=0) return;
       const k=Math.min(d,110)*7.2/Math.max(d,1);
+      // El tiro se descuenta ACA. Antes se descontaba tras 1,1 s de quietud, y como cada
+      // disparo reiniciaba ese contador, tirando seguido nunca se gastaban los tres.
+      this.tiros--;
       this.proy={x:this.gom.x,y:this.gom.y,vx:dx*k,vy:dy*k,act:true,golpes:0};
       this.reposo=0; this.tiroEnCurso=true;
     },
@@ -2458,7 +2484,7 @@ function jDerrumbe(){
             b.dorm=false; b.vx+=p.vx*.32; b.vy+=p.vy*.26-40;
             this.despertar(b);
             p.vx*=.42; p.vy*=.42; p.golpes++;
-            if(f>560) b.vivo=false;
+            if(f>560){ b.vivo=false; this.despertarTodos(); }   // si no, lo de arriba queda flotando
             if(p.golpes>6) p.act=false;
           }
         }
@@ -2473,7 +2499,7 @@ function jDerrumbe(){
         mov=true;
         b.vy+=G*dt; b.x+=b.vx*dt; b.y+=b.vy*dt;
         if(b.y+b.h>S){ b.y=S-b.h; if(b.vy>0) b.vy=0; b.vx*=.55; }
-        if(b.x<-b.w-40||b.x>this.W+40) b.vivo=false;
+        if(b.x<-b.w-40||b.x>this.W+40){ b.vivo=false; this.despertarTodos(); }
       }
       for(let it=0;it<2;it++) this.separar();
       // objetivos aplastados por un bloque veloz
@@ -2491,12 +2517,11 @@ function jDerrumbe(){
       if(!this.objetivos.some(o=>o.vivo)){
         this.puntos++; this.nivel++; this.generar(); return;
       }
-      // OJO: solo cuenta como tiro gastado si realmente disparaste. Sin esta guarda,
-      // la estructura quieta del arranque consumia un tiro cada 1,1 s sola.
+      // cuando todo se aquieta despues de un tiro, recien ahi se juzga la jugada
       const quieto=this.tiroEnCurso&&(!p||!p.act)&&!mov;
       this.reposo = quieto ? this.reposo+dt : 0;
       if(this.reposo>1.1){
-        this.reposo=0; this.tiroEnCurso=false; this.tiros--; this.proy=null;
+        this.reposo=0; this.tiroEnCurso=false; this.proy=null;
         if(this.tiros<=0) this.morir('Te quedaste sin tiros en el nivel '+this.nivel);
       }
     },
@@ -2534,6 +2559,10 @@ function jDerrumbe(){
         Math.abs(o.y-(b.y+b.h))<2.5);
     },
     despertar(b){ if(b.vivo) b.dorm=false; },
+    /* Al desaparecer un bloque cambia quien apoya sobre quien, y un bloque dormido no se entera
+       solo. Son <=23 bloques: despertarlos a todos y dejar que se reacomoden es lo mas barato. */
+    despertarTodos(){ for(const b of this.bloques) if(b.vivo) b.dorm=false; },
+    redimensionar(){ this.despertarTodos(); },
     dibujar(ctx){
       const W=this.W,H=this.H,S=this.suelo();
       const g=ctx.createLinearGradient(0,0,0,H);
