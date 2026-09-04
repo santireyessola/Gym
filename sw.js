@@ -2,7 +2,7 @@
    index.html se busca primero en la red (para recibir actualizaciones)
    y cae al caché si no hay conexión. El resto se sirve del caché.
    Además programa la notificación de "descanso terminado" del cronómetro. */
-const CACHE = 'atlas-v6';
+const CACHE = 'atlas-v7';
 const ARCHIVOS = ['./', './index.html', './manifest.webmanifest', './icon-192.png', './icon-512.png'];
 
 self.addEventListener('install', e => {
