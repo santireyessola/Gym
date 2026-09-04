@@ -3,12 +3,12 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-<meta name="theme-color" content="#000000">
+<meta name="theme-color" content="#0f0d0c">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="apple-touch-icon" href="icon-192.png">
-<title>Mis Rutinas</title>
+<title>ATLAS</title>
 <style>
 :root{
   /* ===== Paleta "fuego" sobre oscuro cálido =====
@@ -250,12 +250,6 @@ details .body{background:var(--sc-low); border-radius:0 0 var(--r-m) var(--r-m);
 @keyframes pop{0%{transform:scale(1)} 45%{transform:scale(1.25)} 100%{transform:scale(1)}}
 .tbar{position:fixed; bottom:0; left:0; right:0; max-width:760px; margin:0 auto; background:var(--sc);
   display:flex; justify-content:space-between; align-items:center; padding:12px 16px; z-index:60; font-weight:500;}
-/* ---- calendario de actividad ---- */
-.cal{display:flex; gap:3px;}
-.cal .col{display:flex; flex-direction:column; gap:3px; flex:1;}
-.cal i{aspect-ratio:1; border-radius:var(--r-xs); background:var(--sc-high); display:block;
-  transition:background var(--d-m) var(--e-std);}
-.cal i.on{background:var(--primary);}
 
 /* ============ v2: componentes nuevos ============ */
 .hdr h1{line-height:1.15;}
@@ -429,6 +423,52 @@ details .body{background:var(--sc-low); border-radius:0 0 var(--r-m) var(--r-m);
   background:radial-gradient(circle at 50% 42%,rgba(255,210,74,.4),transparent 62%);
   animation:prFlash .85s var(--e-emph-dec) forwards;}
 @keyframes prFlash{0%{opacity:0} 25%{opacity:1} 100%{opacity:0}}
+/* ============ JUEGOS ============ */
+.jcard{display:flex; align-items:center; gap:14px; width:100%; text-align:left; background:var(--sc-low);
+  border-radius:var(--r-l); padding:16px; margin-bottom:10px; box-shadow:var(--el1);
+  transition:transform var(--d-s) var(--e-emph);}
+.jcard:active{transform:scale(.985);}
+.jcard .ji{width:52px; height:52px; border-radius:var(--r-m); flex-shrink:0; display:flex;
+  align-items:center; justify-content:center; font-size:1.7rem; background:var(--sc-highest);}
+.jcard .jm{flex:1; min-width:0;}
+.jcard .jm b{display:block; font-size:1rem; font-weight:600;}
+.jcard .jm small{display:block; color:var(--on-surface-var); font-size:.75rem; margin-top:3px; line-height:1rem;}
+.jcard .jr{text-align:right; flex-shrink:0;}
+.jcard .jr b{display:block; font-size:1.15rem; font-weight:800; color:var(--gold); line-height:1.3rem;
+  font-variant-numeric:tabular-nums;}
+.jcard .jr span{display:block; font-size:.5625rem; color:var(--on-surface-var); text-transform:uppercase;
+  letter-spacing:.045em; font-weight:600;}
+/* capa de juego a pantalla completa */
+.jugar{position:fixed; inset:0; z-index:110; background:var(--surface); display:flex; flex-direction:column;
+  animation:focoIn var(--d-m) var(--e-emph-dec);}
+.jbar{display:flex; align-items:center; gap:10px; padding:6px 6px 6px 14px; flex-shrink:0;}
+.jbar .jt{font-weight:700; font-size:.9375rem; flex:1; min-width:0; white-space:nowrap; overflow:hidden;
+  text-overflow:ellipsis;}
+.jbar .jp{font-size:1.35rem; font-weight:800; font-variant-numeric:tabular-nums; letter-spacing:-.5px;}
+.jbar .jrec{font-size:.6875rem; color:var(--gold); font-weight:700; text-align:right; line-height:.9rem;}
+/* reloj compacto del descanso mientras jugás */
+.jcrono{display:inline-flex; align-items:center; gap:5px; background:var(--sc-high); border-radius:var(--r-full);
+  padding:5px 11px; font-size:.8125rem; font-weight:700; font-variant-numeric:tabular-nums; flex-shrink:0;}
+.jcrono.poco{background:var(--primary-c); color:var(--on-primary-c);}
+.jcrono.fin{background:var(--tertiary); color:var(--on-tertiary); animation:pop var(--d-m) var(--e-emph-dec);}
+#jcanvas{flex:1; width:100%; display:block; touch-action:none;}
+/* capa de mensajes sobre el canvas (listo / fin de partida) */
+.jover{position:absolute; inset:0; display:flex; flex-direction:column; align-items:center; justify-content:center;
+  gap:14px; padding:24px; text-align:center; background:rgba(15,13,12,.82); backdrop-filter:blur(3px);
+  animation:fade var(--d-s) var(--e-std);}
+.jover h2{font-size:1.6rem; font-weight:800; letter-spacing:-.6px;}
+.jover .big{font-size:3.4rem; font-weight:800; line-height:1; letter-spacing:-2px; color:var(--flame);
+  font-variant-numeric:tabular-nums;}
+.jover .sub{color:var(--on-surface-var); font-size:.875rem; max-width:280px; line-height:1.4;}
+.jover .nuevo{color:var(--gold); font-weight:800; font-size:1rem;}
+.jwrap{position:relative; flex:1; display:flex; min-height:0;}
+/* aviso de fin de descanso que NO corta la partida */
+.javiso{position:absolute; left:12px; right:12px; top:10px; z-index:5; background:var(--tertiary);
+  color:var(--on-tertiary); border-radius:var(--r-m); padding:12px 14px; font-weight:700; font-size:.875rem;
+  display:flex; align-items:center; justify-content:space-between; gap:10px; box-shadow:var(--el3);
+  animation:snackIn var(--d-m) var(--e-emph-dec);}
+.javiso button{background:var(--on-tertiary); color:var(--tertiary); border-radius:var(--r-full);
+  padding:7px 14px; font-weight:700; font-size:.8125rem; flex-shrink:0;}
 /* ============ MOVIMIENTO ============ */
 /* entrada escalonada de listas: cada elemento entra un toque después del anterior */
 .stagger>*{animation:enter var(--d-m) var(--e-emph-dec) backwards;}
@@ -561,6 +601,8 @@ function normalizar(){
   if(S.ultimoRespaldo===undefined) S.ultimoRespaldo=null;
   if(!S.logs) S.logs={};
   if(!Array.isArray(S.logrosVistos)) S.logrosVistos=[];
+  if(!S.juegos) S.juegos={};
+  ['vuelo','torre','derrumbe'].forEach(k=>{ if(!S.juegos[k]) S.juegos[k]={rec:0}; });
   // migración: el historial de peso/reps vivía por instancia de ejercicio (por día),
   // por eso el mismo ejercicio en dos días no se veía conectado. Se junta todo en
   // S.logs (por ejercicio, global) y se borra de la instancia vieja — idempotente,
@@ -624,7 +666,8 @@ function estadisticas(){
     seriesSemana:estaSem.reduce((a,s)=>a+seriesSesion(s),0),
     tonMes:esteMes.reduce((a,s)=>a+tonelajeSesion(s),0),
     tonMax:ses.reduce((a,s)=>Math.max(a,tonelajeSesion(s)),0),
-    prs:contarPRs(), dias:fechas.size
+    prs:contarPRs(), dias:fechas.size,
+    juegos:{vuelo:recordDe('vuelo'), torre:recordDe('torre'), derrumbe:recordDe('derrumbe')}
   };
 }
 const LOGROS=[
@@ -640,6 +683,10 @@ const LOGROS=[
  {id:'pr10',   ic:'🚀', nom:'Rompiendo techos', desc:'10 récords de peso',                  meta:10,    val:e=>e.prs},
  {id:'ton5',   ic:'🐘', nom:'5 toneladas',      desc:'5.000 kg movidos en un entrenamiento',meta:5000,  val:e=>e.tonMax},
  {id:'ton10',  ic:'🦣', nom:'10 toneladas',     desc:'10.000 kg en un entrenamiento',       meta:10000, val:e=>e.tonMax},
+ // de los juegos de los descansos
+ {id:'jvuelo', ic:'🐦', nom:'Buen vuelo',       desc:'Pasá 20 obstáculos en Vuelo',         meta:20,    val:e=>e.juegos.vuelo},
+ {id:'jtorre', ic:'🧱', nom:'Buen pulso',       desc:'Llegá a 15 pisos en Torre',           meta:15,    val:e=>e.juegos.torre},
+ {id:'jderr',  ic:'🎯', nom:'Demoledor',        desc:'Superá 5 niveles en Derrumbe',        meta:5,     val:e=>e.juegos.derrumbe},
 ];
 function logrosCon(e){ return LOGROS.map(l=>{ const v=l.val(e); return {...l,val:v,on:v>=l.meta}; }); }
 /* Se llama después de guardar progreso: si desbloqueaste algo nuevo, lo festeja una sola vez. */
@@ -829,10 +876,13 @@ function pintarApp(){
   else if(vista.p==='rutina') app.innerHTML=vRutina();
   else if(vista.p==='ejercicios') app.innerHTML=vEjercicios();
   else if(vista.p==='cuerpo') app.innerHTML=vCuerpo();
+  else if(vista.p==='juegos') app.innerHTML=vJuegos();
   else if(vista.p==='sesion') app.innerHTML=vSesion();
   if(vista.p!=='sesion') app.innerHTML+=vTabs();
   app.innerHTML+=timerHtml();   // el cronometro se ve desde cualquier pantalla
+  if(vista.juego) app.innerHTML+=vJugar();   // el juego va por encima de todo
   ajustarEspacioCrono();
+  montarJuego();
 }
 /* La nav bar y el cronómetro son `position:fixed` y tapan el final de la página.
    OJO: reservar el espacio con `padding-bottom` en <body> NO funciona — no extiende
@@ -884,13 +934,16 @@ function vTabs(){
   const pesa=a=>`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="${a?2.6:1.9}" stroke-linecap="round"><path d="M6.5 6.5v11M2.8 9.5v5M17.5 6.5v11M21.2 9.5v5M6.5 12h11"/></svg>`;
   const cuerpo=a=>a?'<svg viewBox="0 0 24 24" fill="currentColor"><path d="M3 18h3v4H3zm5.5-8h3v12h-3zM14 13h3v9h-3zm5.5-9h3v18h-3z"/></svg>'
                    :'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linejoin="round"><path d="M3.5 18.5h2v3h-2zm5.5-8h2v11H9zm5.5 3h2v8h-2zm5.5-9h2v17h-2z"/></svg>';
-  const ej=vista.p==='ejercicios', cu=vista.p==='cuerpo', ini=!ej&&!cu;
+  const mando=a=>a?'<svg viewBox="0 0 24 24" fill="currentColor"><path d="M17 6H7a5 5 0 0 0-5 5v4a3 3 0 0 0 5.2 2l1.3-1.3h7l1.3 1.3A3 3 0 0 0 22 15v-4a5 5 0 0 0-5-5M8.5 13H7v1.5H5.5V13H4v-1.5h1.5V10H7v1.5h1.5zm5.5.5a1 1 0 1 1 0-2 1 1 0 0 1 0 2m3 2a1 1 0 1 1 0-2 1 1 0 0 1 0 2m0-4a1 1 0 1 1 0-2 1 1 0 0 1 0 2"/></svg>'
+                 :'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"><path d="M7 7h10a4 4 0 0 1 4 4v4a2 2 0 0 1-3.4 1.4L16 15H8l-1.6 1.4A2 2 0 0 1 3 15v-4a4 4 0 0 1 4-4z"/><path d="M6.2 11.6v2.2M5.1 12.7h2.2" stroke-linecap="round"/></svg>';
+  const ej=vista.p==='ejercicios', cu=vista.p==='cuerpo', ju=vista.p==='juegos', ini=!ej&&!cu&&!ju;
   const tab=(activo,ico,lb,destino)=>`<button class="${activo?'on':''}" aria-label="${lb}" onclick="ir('${destino}')">
       <span class="ind sl">${ico(activo)}</span><span class="lb">${lb}</span></button>`;
   return `<nav class="tabs">
     ${tab(ini,casa,'Inicio','inicio')}
     ${tab(ej,pesa,'Ejercicios','ejercicios')}
     ${tab(cu,cuerpo,'Progreso','cuerpo')}
+    ${tab(ju,mando,'Juegos','juegos')}
   </nav>`;
 }
 function ir(p){ vista={p}; render(); }
@@ -978,7 +1031,7 @@ function vInicio(){
         <button class="icobtn sl" aria-label="Copiar rutina" title="Copiar rutina" onclick="event.stopPropagation();copiarRutina('${r.id}')">${icoCopiar}</button>
       </div>`;}).join('')+'</div>';
   }
-  return `<div class="hdr"><h1>Mis Rutinas</h1>
+  return `<div class="hdr"><h1>ATLAS</h1>
     <button class="icobtn sl" aria-label="Pegar rutina" title="Pegar rutina" onclick="abrirPegar()">${icoPegar}</button>
   </div>
   <div class="wrap">
@@ -989,7 +1042,6 @@ function vInicio(){
     ${S.rutinas.length?heroPanel(est):''}
     ${est.total?panelLogros():''}
     ${cards}
-    ${vCalendario()}
     <div style="height:18px"></div>
     <div class="row">
       <button class="btn ghost sm sl" style="flex:1" onclick="exportar()">Exportar respaldo</button>
@@ -1669,6 +1721,8 @@ function anillo(pct,contenido){
   </div>`;
 }
 function timerHtml(){
+  // mientras jugás el reloj va compacto en la barra del juego, no como panel grande
+  if(vista.juego) return '';
   const ct=vista.p!=='sesion'?' contabs':'';
   if(timerAviso){
     return `<div class="tpanel fin${ct}">
@@ -1692,7 +1746,8 @@ function timerHtml(){
     <div class="trow2">
       <button class="tbtn sl" onclick="ajustarTimer(-15)">−15s</button>
       <button class="tbtn sl" onclick="ajustarTimer(30)">+30s</button>
-      <button class="tbtn sl" onclick="togglePausa()">${timerPausa!=null?'▶ Seguir':'❚❚ Pausa'}</button>
+      <button class="tbtn sl" aria-label="${timerPausa!=null?'Seguir':'Pausar'}" onclick="togglePausa()">${timerPausa!=null?'▶':'❚❚'}</button>
+      <button class="tbtn sl" aria-label="Jugar mientras descansás" onclick="jugarEnDescanso()">🎮</button>
       <button class="tbtn pri sl" onclick="pararTimer()">Saltar</button>
     </div>
   </div>`;
@@ -1740,6 +1795,8 @@ function tickTimer(){
   if(ms<=0){ finTimer(); return; }
   const sg=Math.ceil(ms/1000);
   const el=document.getElementById('resto'); if(el) el.textContent=fmtT(sg);
+  const jc=document.getElementById('jcrono');   // reloj compacto mientras jugás
+  if(jc){ jc.textContent='⏱ '+fmtT(sg); jc.classList.toggle('poco',sg<=10); }
   const fg=document.getElementById('tring-fg');
   if(fg&&timerTotal){
     const pct=Math.max(0,Math.min(1,ms/(timerTotal*1000)));
@@ -1864,36 +1921,6 @@ function descartarSesion(){
   toast('Entrenamiento descartado');
 }
 
-/* ---- CALENDARIO DE ACTIVIDAD ---- */
-function vCalendario(){
-  const fechas=new Set();
-  S.rutinas.forEach(r=>{ fechasEntrenadas(r).forEach(f=>fechas.add(f)); });
-  if(!fechas.size) return '';
-  const hoyD=new Date(); const dow=(hoyD.getDay()+6)%7;
-  const finSem=new Date(hoyD); finSem.setDate(hoyD.getDate()+(6-dow));
-  const cols=[];
-  for(let w=14;w>=0;w--){
-    const col=[];
-    for(let dd=0;dd<7;dd++){
-      const dt=new Date(finSem); dt.setDate(finSem.getDate()-w*7-(6-dd));
-      const iso=isoDe(dt);
-      const futuro=dt>hoyD;
-      col.push(`<i class="${fechas.has(iso)?'on':''}"${futuro?' style="opacity:.25"':''}></i>`);
-    }
-    cols.push('<div class="col">'+col.join('')+'</div>');
-  }
-  const racha=rachaSemanas(fechas);
-  const mesA=hoy().slice(0,7); let esteMes=0; fechas.forEach(f=>{ if(f.startsWith(mesA)) esteMes++; });
-  return `<div class="card">
-    <div class="row" style="justify-content:space-between">
-      <h3>Actividad</h3>
-      ${racha>0?`<span style="color:var(--primary);font-weight:700;font-size:.9rem">🔥 ${racha} ${racha===1?'semana':'semanas seguidas'}</span>`:''}
-    </div>
-    <div style="height:10px"></div>
-    <div class="cal">${cols.join('')}</div>
-    <p class="hint">${esteMes} ${esteMes===1?'día entrenado':'días entrenados'} este mes · últimas 15 semanas</p>
-  </div>`;
-}
 
 /* ---- NOTAS POR EJERCICIO ---- */
 let notaCtx=null;
@@ -2115,6 +2142,442 @@ function importar(inp){
     }catch(e){ toast('Archivo inválido'); }
   };
   rd.readAsText(f);
+}
+
+/* ============ JUEGOS ============
+   Motor compartido: un canvas, un bucle y un manejador de toques. Cada juego aporta
+   iniciar/actualizar/dibujar/abajo/arriba y el motor se ocupa del resto (tamaño,
+   récords, pantallas de inicio y fin). Los juegos nunca tocan el DOM. */
+const JUEGOS={
+  vuelo:{nom:'Vuelo', ic:'🐦', desc:'Aleteá y esquivá los obstáculos', unidad:'obstáculos', crear:jVuelo},
+  torre:{nom:'Torre', ic:'🧱', desc:'Apilá los bloques sin que se te achiquen', unidad:'pisos', crear:jTorre},
+  derrumbe:{nom:'Derrumbe', ic:'🎯', desc:'Estirá la gomera y volteá los objetivos', unidad:'niveles', crear:jDerrumbe},
+};
+let juego=null, jcanvas=null, jraf=null, jt0=0, jPendiente=false;
+
+function recordDe(id){ return (S.juegos&&S.juegos[id]&&S.juegos[id].rec)||0; }
+/* Atajo desde el cronómetro: abre el último juego que jugaste, o la lista si es la primera vez. */
+function jugarEnDescanso(){
+  const id=S.ultimoJuego&&JUEGOS[S.ultimoJuego]?S.ultimoJuego:null;
+  if(id) abrirJuego(id); else ir('juegos');
+}
+function abrirJuego(id){
+  if(!JUEGOS[id]) return;
+  S.ultimoJuego=id; guardar();
+  juego=JUEGOS[id].crear();
+  juego.id=id; juego.estado='listo'; juego.puntos=0; juego.motivo=''; juego.superado=false;
+  juego.morir=function(m){ this.estado='fin'; this.motivo=m||''; };
+  vista.juego=id; rerender();
+}
+function jugarYa(){ if(juego){ jPendiente=true; juego.estado='jugando'; rerender(); } }
+function cerrarJuego(){ pararBucle(); juego=null; vista.juego=null; render(); }
+function terminarPartida(){
+  if(!juego) return;
+  const id=juego.id, p=Math.round(juego.puntos);
+  juego.superado = p>recordDe(id) && p>0;
+  if(juego.superado){
+    S.juegos[id].rec=p; guardar();
+    celebrar('🏆 ¡Récord en '+JUEGOS[id].nom+'! '+p+' '+JUEGOS[id].unidad);
+    revisarLogros();
+  }
+  rerender();
+}
+/* El canvas se recrea en cada repintado (el estado del juego vive en JS, no en el DOM),
+   así que acá lo volvemos a enganchar y seguimos donde estábamos. */
+function montarJuego(){
+  const c=document.getElementById('jcanvas');
+  if(!c||!juego){ pararBucle(); jcanvas=null; return; }
+  jcanvas=c;
+  dimensionarJuego();
+  c.addEventListener('pointerdown',e=>{
+    e.preventDefault(); c.setPointerCapture&&c.setPointerCapture(e.pointerId);
+    if(juego&&juego.estado==='jugando'&&juego.abajo) juego.abajo(...jxy(e));
+  });
+  c.addEventListener('pointermove',e=>{ if(juego&&juego.estado==='jugando'&&juego.mueve) juego.mueve(...jxy(e)); });
+  c.addEventListener('pointerup',e=>{ if(juego&&juego.estado==='jugando'&&juego.arriba) juego.arriba(...jxy(e)); });
+  if(jPendiente){ jPendiente=false; juego.puntos=0; juego.motivo=''; juego.superado=false; juego.iniciar(); }
+  arrancarBucle();
+}
+function jxy(e){ const r=jcanvas.getBoundingClientRect(); return [e.clientX-r.left, e.clientY-r.top]; }
+function dimensionarJuego(){
+  if(!jcanvas) return;
+  const r=jcanvas.getBoundingClientRect();
+  const dpr=Math.min(2,window.devicePixelRatio||1);
+  jcanvas.width=Math.max(1,Math.round(r.width*dpr));
+  jcanvas.height=Math.max(1,Math.round(r.height*dpr));
+  jcanvas.getContext('2d').setTransform(dpr,0,0,dpr,0,0);
+  if(juego){ juego.W=r.width; juego.H=r.height; }
+}
+function arrancarBucle(){ pararBucle(); jt0=performance.now(); jraf=requestAnimationFrame(jpaso); }
+function pararBucle(){ if(jraf) cancelAnimationFrame(jraf); jraf=null; }
+function jpaso(t){
+  if(!juego||!jcanvas){ pararBucle(); return; }
+  jraf=requestAnimationFrame(jpaso);
+  const dt=Math.min(.045,Math.max(0,(t-jt0)/1000)); jt0=t;
+  if(juego.estado==='jugando'){
+    juego.actualizar(dt);
+    if(juego.estado==='fin'){ pararBucle(); terminarPartida(); return; }
+  }
+  juego.dibujar(jcanvas.getContext('2d'));
+  const n=document.getElementById('jpuntos');
+  if(n) n.textContent=Math.round(juego.puntos);
+}
+/* ---- pantallas de la sección ---- */
+function vJuegos(){
+  return `<div class="hdr"><h1>Juegos</h1></div>
+  <div class="wrap">
+    <p class="hint" style="margin:0 0 14px">Para los descansos entre series. Partidas cortas, todo con un dedo.</p>
+    <div class="stagger">
+    ${Object.keys(JUEGOS).map(id=>{
+      const j=JUEGOS[id], rec=recordDe(id);
+      return `<button class="jcard sl" onclick="abrirJuego('${id}')">
+        <span class="ji">${j.ic}</span>
+        <span class="jm"><b>${j.nom}</b><small>${j.desc}</small></span>
+        <span class="jr"><b>${rec||'—'}</b><span>${rec?j.unidad:'sin récord'}</span></span>
+      </button>`;
+    }).join('')}
+    </div>
+  </div>`;
+}
+function chipCronoJuego(){
+  if(timerAviso||(timerFin==null&&timerPausa==null)) return '';
+  const sg=Math.ceil(Math.max(0,timerMs())/1000);
+  return `<span class="jcrono ${sg<=10?'poco':''}" id="jcrono">⏱ ${fmtT(sg)}</span>`;
+}
+function vJugar(){
+  const def=JUEGOS[vista.juego]; if(!def||!juego) return '';
+  let capa='';
+  if(juego.estado==='listo'){
+    capa=`<div class="jover">
+      <h2>${def.ic} ${def.nom}</h2>
+      <p class="sub">${juego.ayuda||def.desc}</p>
+      <button class="btn sl" onclick="jugarYa()">Empezar</button>
+    </div>`;
+  }else if(juego.estado==='fin'){
+    capa=`<div class="jover">
+      ${juego.motivo?`<div class="sub">${esc(juego.motivo)}</div>`:''}
+      <div class="big">${Math.round(juego.puntos)}</div>
+      <div class="sub">${def.unidad}</div>
+      ${juego.superado?'<div class="nuevo">🏆 ¡Nuevo récord!</div>'
+                      :`<div class="sub">Tu récord: ${recordDe(juego.id)||'—'}</div>`}
+      <div class="row" style="gap:10px;margin-top:6px">
+        <button class="btn sl" onclick="jugarYa()">Otra vez</button>
+        <button class="btn ghost sl" onclick="cerrarJuego()">Salir</button>
+      </div>
+    </div>`;
+  }
+  return `<div class="jugar">
+    <div class="jbar">
+      <button class="back sl" aria-label="Salir del juego" onclick="cerrarJuego()">${icoCerrar}</button>
+      <span class="jt">${def.nom}</span>
+      ${chipCronoJuego()}
+      <span class="jp" id="jpuntos">${Math.round(juego.puntos)}</span>
+      <span class="jrec">récord<br>${recordDe(juego.id)||'—'}</span>
+    </div>
+    <div class="jwrap">
+      <canvas id="jcanvas"></canvas>
+      ${timerAviso?`<div class="javiso">✔ Terminó el descanso
+        <button onclick="cerrarJuego()">Volver</button></div>`:''}
+      ${capa}
+    </div>
+  </div>`;
+}
+
+/* ---- 1. VUELO (esquivar obstáculos aleteando) ---- */
+function jVuelo(){
+  return {
+    ayuda:'Tocá la pantalla para aletear. Pasá entre los obstáculos sin chocar.',
+    iniciar(){
+      this.y=this.H*.4; this.vy=0; this.tubos=[]; this.t=0; this.alas=0;
+      for(let i=0;i<3;i++) this.nuevo(this.W+120+i*this.sep());
+    },
+    sep(){ return Math.max(150,Math.min(230,this.W*.58)); },
+    nuevo(x){
+      const m=40, hueco=Math.max(112,164-this.puntos*1.6);
+      const gy=m+hueco/2+Math.random()*Math.max(10,this.H-2*m-hueco);
+      this.tubos.push({x,gy,hueco,pasado:false});
+    },
+    actualizar(dt){
+      this.t+=dt; this.alas=Math.max(0,this.alas-dt);
+      this.vy+=1500*dt; this.y+=this.vy*dt;
+      const R=13, bx=this.W*.26, vel=170+Math.min(110,this.puntos*3.5), AN=52;
+      if(this.y-R<0){ this.y=R; this.vy=0; }
+      if(this.y+R>this.H-4){ this.morir('Tocaste el piso'); return; }
+      for(const t of this.tubos){
+        t.x-=vel*dt;
+        if(bx+R>t.x && bx-R<t.x+AN && (this.y-R<t.gy-t.hueco/2 || this.y+R>t.gy+t.hueco/2)){
+          this.morir('Chocaste'); return;
+        }
+        if(!t.pasado && t.x+AN<bx-R){ t.pasado=true; this.puntos++; }
+      }
+      if(this.tubos.length && this.tubos[0].x<-AN-10) this.tubos.shift();
+      const u=this.tubos[this.tubos.length-1];
+      if(u && u.x < this.W-this.sep()) this.nuevo(this.W+10);
+    },
+    abajo(){ this.vy=-430; this.alas=.18; },
+    dibujar(ctx){
+      const W=this.W,H=this.H,AN=52,bx=W*.26;
+      const g=ctx.createLinearGradient(0,0,0,H);
+      g.addColorStop(0,'#16120f'); g.addColorStop(1,'#241a13');
+      ctx.fillStyle=g; ctx.fillRect(0,0,W,H);
+      ctx.fillStyle='#c2410c';
+      for(const t of this.tubos){
+        ctx.fillRect(t.x,0,AN,t.gy-t.hueco/2);
+        ctx.fillRect(t.x,t.gy+t.hueco/2,AN,H-(t.gy+t.hueco/2));
+        ctx.fillStyle='#ff7a18';
+        ctx.fillRect(t.x-3,t.gy-t.hueco/2-12,AN+6,12);
+        ctx.fillRect(t.x-3,t.gy+t.hueco/2,AN+6,12);
+        ctx.fillStyle='#c2410c';
+      }
+      ctx.save(); ctx.translate(bx,this.y);
+      ctx.rotate(Math.max(-.5,Math.min(.9,this.vy/900)));
+      ctx.fillStyle='#ffd24a'; ctx.beginPath(); ctx.arc(0,0,13,0,7); ctx.fill();
+      ctx.fillStyle='#ff7a18'; ctx.beginPath();
+      ctx.ellipse(-3,this.alas>0?-6:4,9,5,this.alas>0?-.6:.3,0,7); ctx.fill();
+      ctx.fillStyle='#2a1000'; ctx.beginPath(); ctx.arc(6,-4,2.4,0,7); ctx.fill();
+      ctx.restore();
+    }
+  };
+}
+
+/* ---- 2. TORRE (apilar con precisión) ---- */
+function jTorre(){
+  return {
+    ayuda:'Tocá para soltar el bloque justo encima del anterior. Lo que sobresale se corta.',
+    ALTO:26,
+    iniciar(){
+      const w=Math.min(150,this.W*.44);
+      this.pila=[{x:(this.W-w)/2,w}]; this.debris=[]; this.cam=0;
+      this.nuevo();
+    },
+    nuevo(){
+      const u=this.pila[this.pila.length-1];
+      const desdeIzq=Math.random()<.5;
+      this.act={x:desdeIzq?0:this.W-u.w, w:u.w, dir:desdeIzq?1:-1,
+                vel:110+Math.min(230,this.puntos*8)};
+    },
+    yDe(i){ return this.H-34-(i+1)*this.ALTO+this.cam; },
+    actualizar(dt){
+      const a=this.act;
+      a.x+=a.dir*a.vel*dt;
+      if(a.x<0){ a.x=0; a.dir=1; }
+      if(a.x+a.w>this.W){ a.x=this.W-a.w; a.dir=-1; }
+      for(const d of this.debris){ d.vy+=1500*dt; d.y+=d.vy*dt; d.rot+=d.vr*dt; }
+      this.debris=this.debris.filter(d=>d.y<this.H+140);
+      const obj=Math.max(0,(this.pila.length-7)*this.ALTO);
+      this.cam+=(obj-this.cam)*Math.min(1,dt*7);
+    },
+    abajo(){
+      const u=this.pila[this.pila.length-1], a=this.act;
+      const izq=Math.max(u.x,a.x), der=Math.min(u.x+u.w,a.x+a.w);
+      const ov=der-izq;
+      if(ov<=2){ this.morir('Se te cayó la torre'); return; }
+      const y=this.yDe(this.pila.length);
+      if(a.x<izq-.5) this.debris.push({x:a.x,w:izq-a.x,y,vy:-40,rot:0,vr:-5});
+      if(a.x+a.w>der+.5) this.debris.push({x:der,w:a.x+a.w-der,y,vy:-40,rot:0,vr:5});
+      this.pila.push({x:izq,w:ov});
+      this.puntos++;
+      this.nuevo();
+    },
+    dibujar(ctx){
+      const W=this.W,H=this.H,A=this.ALTO;
+      ctx.fillStyle='#14100e'; ctx.fillRect(0,0,W,H);
+      const tonos=['#ff7a18','#ffa24d','#ffd24a','#fb923c'];
+      const pinta=(x,y,w,i)=>{
+        ctx.fillStyle=tonos[i%tonos.length];
+        ctx.fillRect(x,y,w,A-2);
+        ctx.fillStyle='rgba(0,0,0,.18)'; ctx.fillRect(x,y+A-7,w,5);
+      };
+      this.pila.forEach((b,i)=>{ const y=this.yDe(i); if(y<H+A&&y>-A) pinta(b.x,y,b.w,i); });
+      for(const d of this.debris){
+        ctx.save(); ctx.translate(d.x+d.w/2,d.y+A/2); ctx.rotate(d.rot);
+        ctx.fillStyle='rgba(255,122,24,.55)'; ctx.fillRect(-d.w/2,-A/2,d.w,A-2); ctx.restore();
+      }
+      const a=this.act;
+      if(a) pinta(a.x,this.yDe(this.pila.length),a.w,this.pila.length);
+      ctx.fillStyle='rgba(240,235,232,.35)'; ctx.fillRect(0,H-8,W,8);
+    }
+  };
+}
+
+/* ---- 3. DERRUMBE (gomera + estructura que colapsa) ----
+   Física simple de cajas SIN rotación: es estable y se ve bien. La rotación queda
+   sólo en los escombros, que es cosmética y no participa de las colisiones. */
+function jDerrumbe(){
+  return {
+    ayuda:'Estirá desde la gomera y soltá. Volteá todos los objetivos: tenés 3 tiros por nivel.',
+    G:1700,
+    iniciar(){ this.nivel=1; this.puntos=0; this.generar(); },
+    suelo(){ return this.H-26; },
+    generar(){
+      const W=this.W, S=this.suelo();
+      this.bloques=[]; this.objetivos=[]; this.proy=null; this.drag=null;
+      this.tiros=3; this.reposo=0; this.tiroEnCurso=false;
+      this.gom={x:W*.13, y:S-96};
+      // Bloques grandes a proposito: en un celular en vertical una estructura chica
+      // queda perdida abajo y apuntarle es incomodo.
+      const bw=Math.max(22,Math.min(40,W*.078)), bh=bw*.85;
+      const x0=W*.40, paso=bw*2.5;
+      const maxCols=Math.max(2,Math.floor((W-10-x0-bw)/paso)+1);
+      const cols=Math.min(maxCols,2+Math.floor((this.nivel-1)/2));
+      const alto=Math.min(7,3+Math.floor(this.nivel/3));
+      for(let c=0;c<cols;c++){
+        const px=x0+c*paso;
+        for(let k=0;k<alto;k++) this.bloques.push(this.caja(px,S-(k+1)*bh,bw,bh));
+        // viga horizontal que une cada par de columnas
+        if(c>0) this.bloques.push(this.caja(px-paso,S-(alto+1)*bh,paso+bw,bh*.7));
+        // objetivo apoyado arriba de la columna, alternando
+        if(c%2===0) this.objetivos.push({x:px+bw/2, y:S-alto*bh-16, r:15, vivo:true});
+      }
+      if(!this.objetivos.length) this.objetivos.push({x:x0+bw/2, y:S-16, r:15, vivo:true});
+    },
+    caja(x,y,w,h){ return {x,y,w,h,vx:0,vy:0,dorm:true,vivo:true}; },
+    abajo(x,y){ if(!this.proy||!this.proy.act) this.drag={x,y}; },
+    mueve(x,y){ if(this.drag) this.drag={x,y}; },
+    arriba(){
+      if(!this.drag) return;
+      const dx=this.gom.x-this.drag.x, dy=this.gom.y-this.drag.y;
+      const d=Math.hypot(dx,dy);
+      this.drag=null;
+      if(d<12) return;
+      const k=Math.min(d,110)*7.2/Math.max(d,1);
+      this.proy={x:this.gom.x,y:this.gom.y,vx:dx*k,vy:dy*k,act:true,golpes:0};
+      this.reposo=0; this.tiroEnCurso=true;
+    },
+    actualizar(dt){
+      const S=this.suelo(), G=this.G;
+      const p=this.proy;
+      if(p&&p.act){
+        p.vy+=G*dt; p.x+=p.vx*dt; p.y+=p.vy*dt;
+        if(p.y>S-7){ p.y=S-7; p.vy*=-.32; p.vx*=.55; if(Math.abs(p.vy)<70) p.vy=0; }
+        if(p.x>this.W+90||p.x<-90||(Math.abs(p.vx)<14&&p.y>=S-8)) p.act=false;
+        for(const b of this.bloques){
+          if(!b.vivo) continue;
+          if(p.x+7>b.x&&p.x-7<b.x+b.w&&p.y+7>b.y&&p.y-7<b.y+b.h){
+            const f=Math.hypot(p.vx,p.vy);
+            b.dorm=false; b.vx+=p.vx*.32; b.vy+=p.vy*.26-40;
+            this.despertar(b);
+            p.vx*=.42; p.vy*=.42; p.golpes++;
+            if(f>560) b.vivo=false;
+            if(p.golpes>6) p.act=false;
+          }
+        }
+        for(const o of this.objetivos){
+          if(o.vivo&&Math.hypot(p.x-o.x,p.y-o.y)<o.r+7&&Math.hypot(p.vx,p.vy)>150) o.vivo=false;
+        }
+      }
+      // caída e integración de los bloques despiertos
+      let mov=false;
+      for(const b of this.bloques){
+        if(!b.vivo||b.dorm) continue;
+        mov=true;
+        b.vy+=G*dt; b.x+=b.vx*dt; b.y+=b.vy*dt;
+        if(b.y+b.h>S){ b.y=S-b.h; if(b.vy>0) b.vy=0; b.vx*=.55; }
+        if(b.x<-b.w-40||b.x>this.W+40) b.vivo=false;
+      }
+      for(let it=0;it<2;it++) this.separar();
+      // objetivos aplastados por un bloque veloz
+      for(const o of this.objetivos){
+        if(!o.vivo) continue;
+        for(const b of this.bloques){
+          if(!b.vivo||b.dorm) continue;
+          if(Math.hypot(b.vx,b.vy)>190 && o.x>b.x-o.r && o.x<b.x+b.w+o.r && o.y>b.y-o.r && o.y<b.y+b.h+o.r){ o.vivo=false; break; }
+        }
+      }
+      for(const b of this.bloques){
+        if(b.vivo&&!b.dorm&&Math.abs(b.vx)<7&&Math.abs(b.vy)<7&&this.apoyado(b)){ b.vx=0; b.vy=0; b.dorm=true; }
+      }
+      // ¿nivel superado o tiro perdido?
+      if(!this.objetivos.some(o=>o.vivo)){
+        this.puntos++; this.nivel++; this.generar(); return;
+      }
+      // OJO: solo cuenta como tiro gastado si realmente disparaste. Sin esta guarda,
+      // la estructura quieta del arranque consumia un tiro cada 1,1 s sola.
+      const quieto=this.tiroEnCurso&&(!p||!p.act)&&!mov;
+      this.reposo = quieto ? this.reposo+dt : 0;
+      if(this.reposo>1.1){
+        this.reposo=0; this.tiroEnCurso=false; this.tiros--; this.proy=null;
+        if(this.tiros<=0) this.morir('Te quedaste sin tiros en el nivel '+this.nivel);
+      }
+    },
+    separar(){
+      const bs=this.bloques;
+      for(let i=0;i<bs.length;i++){
+        const a=bs[i]; if(!a.vivo) continue;
+        for(let j=i+1;j<bs.length;j++){
+          const c=bs[j]; if(!c.vivo) continue;
+          const ox=Math.min(a.x+a.w,c.x+c.w)-Math.max(a.x,c.x);
+          const oy=Math.min(a.y+a.h,c.y+c.h)-Math.max(a.y,c.y);
+          if(ox<=0||oy<=0) continue;
+          if(a.dorm&&c.dorm) continue;
+          const pa=a.dorm?0:(c.dorm?1:.5), pc=c.dorm?0:(a.dorm?1:.5);
+          if(oy<ox){
+            const s=a.y<c.y?-1:1;
+            a.y+=s*oy*pa; c.y-=s*oy*pc;
+            const alto=a.y<c.y?a:c, bajo=a.y<c.y?c:a;
+            if(alto.vy>0) alto.vy=0;
+            if(bajo.vy<0) bajo.vy=0;
+            alto.vx*=.82; bajo.vx*=.82;
+          }else{
+            const s=a.x<c.x?-1:1;
+            a.x+=s*ox*pa; c.x-=s*ox*pc;
+            a.vx*=-.28; c.vx*=-.28;
+          }
+          if(!a.dorm) this.despertar(c);
+          if(!c.dorm) this.despertar(a);
+        }
+      }
+    },
+    apoyado(b){
+      if(b.y+b.h>=this.suelo()-1.5) return true;
+      return this.bloques.some(o=>o!==b&&o.vivo&&o.x<b.x+b.w-1&&o.x+o.w>b.x+1&&
+        Math.abs(o.y-(b.y+b.h))<2.5);
+    },
+    despertar(b){ if(b.vivo) b.dorm=false; },
+    dibujar(ctx){
+      const W=this.W,H=this.H,S=this.suelo();
+      const g=ctx.createLinearGradient(0,0,0,H);
+      g.addColorStop(0,'#13100e'); g.addColorStop(1,'#2a1d14');
+      ctx.fillStyle=g; ctx.fillRect(0,0,W,H);
+      ctx.fillStyle='#4a3f38'; ctx.fillRect(0,S,W,H-S);
+      // gomera
+      ctx.strokeStyle='#8c8079'; ctx.lineWidth=5; ctx.beginPath();
+      ctx.moveTo(this.gom.x,S); ctx.lineTo(this.gom.x,this.gom.y); ctx.stroke();
+      const orig=this.drag?this.drag:{x:this.gom.x,y:this.gom.y};
+      if(this.drag){
+        ctx.strokeStyle='#ffd24a'; ctx.lineWidth=3; ctx.beginPath();
+        ctx.moveTo(this.gom.x-9,this.gom.y); ctx.lineTo(orig.x,orig.y);
+        ctx.lineTo(this.gom.x+9,this.gom.y); ctx.stroke();
+        // previsualización de la trayectoria
+        const dx=this.gom.x-orig.x, dy=this.gom.y-orig.y, d=Math.hypot(dx,dy);
+        const k=Math.min(d,110)*7.2/Math.max(d,1);
+        let px=this.gom.x,py=this.gom.y,vx=dx*k,vy=dy*k;
+        ctx.fillStyle='rgba(255,210,74,.55)';
+        for(let i=0;i<26;i++){
+          px+=vx*.035; py+=vy*.035; vy+=this.G*.035;
+          if(py>S) break;
+          if(i%2===0){ ctx.beginPath(); ctx.arc(px,py,2.2,0,7); ctx.fill(); }
+        }
+      }
+      for(const b of this.bloques){
+        if(!b.vivo) continue;
+        ctx.fillStyle=b.dorm?'#c98b52':'#e0a366';
+        ctx.fillRect(b.x,b.y,b.w,b.h);
+        ctx.fillStyle='rgba(0,0,0,.2)'; ctx.fillRect(b.x,b.y+b.h-4,b.w,4);
+      }
+      for(const o of this.objetivos){
+        if(!o.vivo) continue;
+        ctx.fillStyle='#6fdc9b'; ctx.beginPath(); ctx.arc(o.x,o.y,o.r,0,7); ctx.fill();
+        ctx.fillStyle='#00391f';
+        ctx.beginPath(); ctx.arc(o.x-4,o.y-3,2,0,7); ctx.fill();
+        ctx.beginPath(); ctx.arc(o.x+4,o.y-3,2,0,7); ctx.fill();
+      }
+      const p=this.proy;
+      if(p&&p.act){ ctx.fillStyle='#ff7a18'; ctx.beginPath(); ctx.arc(p.x,p.y,7,0,7); ctx.fill(); }
+      ctx.fillStyle='#f0ebe8'; ctx.font='600 13px system-ui,sans-serif';
+      ctx.fillText('Nivel '+this.nivel+'  ·  tiros: '+this.tiros,12,20);
+    }
+  };
 }
 
 /* ---- UTIL ---- */

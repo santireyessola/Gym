@@ -1,13 +1,13 @@
 {
-  "name": "Mis Rutinas",
-  "short_name": "Rutinas",
-  "description": "Generador y seguimiento de rutinas de gimnasio",
+  "name": "ATLAS",
+  "short_name": "ATLAS",
+  "description": "Rutinas de gimnasio, progreso y juegos para los descansos",
   "start_url": "./",
   "scope": "./",
   "display": "standalone",
   "orientation": "portrait",
-  "background_color": "#000000",
-  "theme_color": "#000000",
+  "background_color": "#0f0d0c",
+  "theme_color": "#0f0d0c",
   "icons": [
     { "src": "icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
     { "src": "icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
