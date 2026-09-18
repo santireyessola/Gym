@@ -2,10 +2,12 @@
 <html lang="es">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, viewport-fit=cover">
 <meta name="theme-color" content="#0f0d0c">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="ATLAS">
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="apple-touch-icon" href="icon-192.png">
 <title>ATLAS</title>
@@ -1544,6 +1546,10 @@ window.addEventListener('beforeinstallprompt',e=>{
 window.addEventListener('appinstalled',()=>{
   promptInstalar=null; rerender(); toast('¡App instalada! 💪');
 });
+function esIOS(){
+  return /iphone|ipad|ipod/i.test(navigator.userAgent) ||
+    (navigator.platform==='MacIntel' && navigator.maxTouchPoints>1);
+}
 function bannerInstalar(){
   if(yaInstalada()) return '';
   if(promptInstalar){
@@ -1554,6 +1560,12 @@ function bannerInstalar(){
     </div>`;
   }
   if(location.protocol!=='https:') return '';
+  if(esIOS()){
+    return `<div class="card">
+      <h3>📲 Instalar como app</h3>
+      <p class="hint" style="margin-top:6px">Abrí esta página en <b>Safari</b> (no desde WhatsApp o Instagram), tocá el ícono <b>Compartir</b> (el cuadrado con la flecha hacia arriba) y elegí <b>Agregar a inicio</b>.</p>
+    </div>`;
+  }
   return `<div class="card">
     <h3>📲 Instalar como app</h3>
     <p class="hint" style="margin-top:6px">Si no ves el botón de instalar, abrí esta página en <b>Chrome</b> (no desde el navegador de WhatsApp o Instagram) y tocá el menú <b>⋮</b> arriba a la derecha → <b>Instalar aplicación</b> o <b>Agregar a pantalla principal</b>.</p>
